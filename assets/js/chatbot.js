@@ -320,7 +320,7 @@
         ],
         outros: [
           "I can help with things like these instead:",
-          "Here's what I CAN help you with:",
+          "Here's what I CAN help you with:\n",
           "Try asking me about one of these:"
         ]
       }
