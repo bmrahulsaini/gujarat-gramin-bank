@@ -206,15 +206,13 @@
       wordDelayMs: 25      // delay between each revealed word
     },
 
-    // Friendly intro/outro sentences layered AROUND the factual content -
-    // they never change or add facts, only wording. One of each array is
-    // picked at random per reply. Keyed by topic:
-    //  - rates/branches/contact/general: wrap an actual answer found on the site
-    //  - chairman/board/charges: this content doesn't exist on the site today,
-    //    so these give a friendlier, topic-aware "not published here" voice
-    //    than the fully generic notFound/outOfScope fallbacks below
-    //  - notFound: on-topic question, but no topic-specific wording applies
-    //  - outOfScope: question is unrelated to the bank entirely
+    // Friendly intro/outro sentences layered AROUND factual content that WAS
+    // found - they never change or add facts, only wording. One of each
+    // array is picked at random per reply. Only for successful answers
+    // (rates/branches/contact/general); every "not found" / "out of scope"
+    // case instead uses the single flat notFoundMessage/offTopicMessage
+    // above, so a visitor always sees the exact same wording for the same
+    // kind of rejection rather than several differently-worded variants.
     templates: {
       rates: {
         intros: [
@@ -240,42 +238,6 @@
           "Contact a branch directly for further details."
         ]
       },
-      chairman: {
-        intros: [
-          "I don't have the Chairman's name.",
-          "That information is not currently available.",
-          "I don't have Chairman details available."
-        ],
-        outros: [
-          "Check the Contact section below, or your branch, for this information.",
-          "The Contact section has Head Office details for this kind of query.",
-          "This is not available here; try the Contact section below."
-        ]
-      },
-      board: {
-        intros: [
-          "I don't have the Board of Directors list.",
-          "That information is not currently available.",
-          "I don't have Board of Directors details available."
-        ],
-        outros: [
-          "The Contact section below has Head Office details for this kind of query.",
-          "This may be available in official bank notices at your branch.",
-          "This is not available here; try the Contact section below."
-        ]
-      },
-      charges: {
-        intros: [
-          "A full service charges schedule is not currently available.",
-          "That specific charge is not currently available.",
-          "A detailed fee/charges table is not currently available."
-        ],
-        outros: [
-          "Your branch will have the current official charges schedule.",
-          "Confirm the exact amount with your branch.",
-          "Contact your branch for the current charge amount."
-        ]
-      },
       contact: {
         intros: [
           "Here is the contact information:",
@@ -298,30 +260,6 @@
           "Let me know if you need more detail.",
           "You can ask about another topic.",
           "Let me know if you have another question."
-        ]
-      },
-      notFound: {
-        intros: [
-          "I don't have that information.",
-          "I couldn't find a match for that.",
-          "That doesn't appear to be something I can help with."
-        ],
-        outros: [
-          "Here are some topics I can help with:",
-          "You can try one of these topics:",
-          "I can help with these topics:"
-        ]
-      },
-      outOfScope: {
-        intros: [
-          "That is outside what I can answer.",
-          "I can only answer questions about Gujarat Gramin Bank.",
-          "That question is not related to Gujarat Gramin Bank."
-        ],
-        outros: [
-          "The following topics are available:",
-          "You can try one of these topics:",
-          "I can help with these topics:"
         ]
       }
     },
@@ -1385,19 +1323,15 @@
     return { kind: 'nomatch', text: sentence, html: blocksToStaticHtml(blocks), blocks: blocks };
   }
 
-  // Reuses the existing friendly chairman/board/charges "not published here"
-  // voice (SECTION 6 templates) for an intent that IS recognised but has no
-  // content on this site at all - rather than a generic not-found sentence.
-  function notFoundWithTopicVoice(topicKey) {
-    var tpl = CONFIG.templates[topicKey] || CONFIG.templates.notFound;
-    var intro = pickRandom(tpl.intros);
-    var outro = pickRandom(tpl.outros);
-    var blocks = [
-      textBlock('p', 'ggb-chat-intro-line', intro),
-      textBlock('p', 'ggb-chat-outro-line', outro),
-      { type: 'raw', html: buildChipsHtml() }
-    ];
-    return { kind: 'nomatch', text: intro + ' ' + outro, html: blocksToStaticHtml(blocks), blocks: blocks };
+  // An intent IS recognised (chairman, board, charges...) but there is no
+  // content for it on the site at all. Uses the single flat notFoundMessage
+  // - same wording every time, so a visitor always recognises "not found"
+  // regardless of what was asked, rather than several differently-worded
+  // "friendly" variants that can read as inconsistent to someone with
+  // limited English.
+  function notFoundWithTopicVoice() {
+    var blocks = [textBlock('p', null, CONFIG.notFoundMessage), { type: 'raw', html: buildChipsHtml() }];
+    return { kind: 'nomatch', text: CONFIG.notFoundMessage, html: blocksToStaticHtml(blocks), blocks: blocks };
   }
 
   function answerPhoneIntent(detail) {
@@ -1471,7 +1405,7 @@
       var sentence = person.name + ' is the ' + person.role + ' of Gujarat Gramin Bank.';
       return finishDirectAnswer([textBlock('p', null, sentence)], person.sectionId);
     }
-    return notFoundWithTopicVoice(topicKey);
+    return notFoundWithTopicVoice();
   }
 
   function answerIfscIntent(queryTokens) {
@@ -1542,7 +1476,7 @@
   }
 
   function answerChargeIntent() {
-    if (!FACTS.charges.length) return notFoundWithTopicVoice('charges');
+    if (!FACTS.charges.length) return notFoundWithTopicVoice();
     var match = FACTS.charges[0];
     return finishDirectAnswer([textBlock('p', null, match.text)], match.sectionId);
   }
@@ -1652,15 +1586,8 @@
     // be mistaken for a rates question just because "rate" is also in it.
     var hasOffTopicWord = rawWords.some(function (w) { return CONFIG.offTopicWords.indexOf(w) !== -1; });
     if (hasOffTopicWord) {
-      var hardTpl = CONFIG.templates.outOfScope;
-      var hardIntro = pickRandom(hardTpl.intros);
-      var hardOutro = pickRandom(hardTpl.outros);
-      var hardBlocks = [
-        textBlock('p', 'ggb-chat-intro-line', hardIntro),
-        textBlock('p', 'ggb-chat-outro-line', hardOutro),
-        { type: 'raw', html: buildChipsHtml() + buildContactLinkHtml() }
-      ];
-      return { kind: 'offtopic', text: hardIntro + ' ' + hardOutro, html: blocksToStaticHtml(hardBlocks), blocks: hardBlocks };
+      var hardBlocks = [textBlock('p', null, CONFIG.offTopicMessage), { type: 'raw', html: buildChipsHtml() + buildContactLinkHtml() }];
+      return { kind: 'offtopic', text: CONFIG.offTopicMessage, html: blocksToStaticHtml(hardBlocks), blocks: hardBlocks };
     }
 
     // SECTION 6b: answer the exact thing asked, from the structured FACTS
@@ -1677,44 +1604,18 @@
     var coverage = knownCount / rawWords.length;
 
     if (coverage < CONFIG.offTopicMinCoverage) {
-      // A question that genuinely names one of our known topics (e.g. a
-      // bare "chairman") still gets that topic's friendlier voice instead
-      // of the harsher, fully generic "outside my scope" one.
-      var offTopic = classifyTopic(queryTokens, null, rawWords) || 'outOfScope';
-      var offTopicTpl = CONFIG.templates[offTopic] || CONFIG.templates.outOfScope;
-      var offTopicIntro = pickRandom(offTopicTpl.intros);
-      var offTopicOutro = pickRandom(offTopicTpl.outros);
-      var offTopicBlocks = [
-        textBlock('p', 'ggb-chat-intro-line', offTopicIntro),
-        textBlock('p', 'ggb-chat-outro-line', offTopicOutro),
-        { type: 'raw', html: buildChipsHtml() + buildContactLinkHtml() }
-      ];
-      return {
-        kind: 'offtopic',
-        text: offTopicIntro + ' ' + offTopicOutro,
-        html: blocksToStaticHtml(offTopicBlocks),
-        blocks: offTopicBlocks
-      };
+      // Same flat message as any other off-topic rejection - a visitor
+      // should always see identical wording for "can't answer that",
+      // regardless of which words triggered it.
+      var offTopicBlocks = [textBlock('p', null, CONFIG.offTopicMessage), { type: 'raw', html: buildChipsHtml() + buildContactLinkHtml() }];
+      return { kind: 'offtopic', text: CONFIG.offTopicMessage, html: blocksToStaticHtml(offTopicBlocks), blocks: offTopicBlocks };
     }
 
     var results = searchAll(queryTokens);
 
     if (!results.length || results[0].score < CONFIG.matchScoreThreshold) {
-      var nomatchTopic = classifyTopic(queryTokens, null, rawWords) || 'notFound';
-      var nomatchTpl = CONFIG.templates[nomatchTopic] || CONFIG.templates.notFound;
-      var nomatchIntro = pickRandom(nomatchTpl.intros);
-      var nomatchOutro = pickRandom(nomatchTpl.outros);
-      var nomatchBlocks = [
-        textBlock('p', 'ggb-chat-intro-line', nomatchIntro),
-        textBlock('p', 'ggb-chat-outro-line', nomatchOutro),
-        { type: 'raw', html: buildChipsHtml() }
-      ];
-      return {
-        kind: 'nomatch',
-        text: nomatchIntro + ' ' + nomatchOutro,
-        html: blocksToStaticHtml(nomatchBlocks),
-        blocks: nomatchBlocks
-      };
+      var nomatchBlocks = [textBlock('p', null, CONFIG.notFoundMessage), { type: 'raw', html: buildChipsHtml() }];
+      return { kind: 'nomatch', text: CONFIG.notFoundMessage, html: blocksToStaticHtml(nomatchBlocks), blocks: nomatchBlocks };
     }
 
     var topChunk = results[0].chunk;
@@ -2025,6 +1926,10 @@
     function done() {
       ui.busy = false;
       setInputEnabled(true);
+      // Disabling the input during the reply blurs it (disabled elements
+      // can't hold focus) - restore focus so the visitor can keep typing
+      // without having to click the input again.
+      if (ui.input) ui.input.focus();
     }
 
     if (prefersReducedMotion()) {
