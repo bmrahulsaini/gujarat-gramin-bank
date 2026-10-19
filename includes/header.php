@@ -49,6 +49,7 @@
   <link rel="stylesheet" href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css">
   <link rel="stylesheet" href="assets/css/fonts.css">
   <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/chatbot.css">
 
   <!-- JSON-LD Structured Data (BankOrCreditUnion) -->
   <script type="application/ld+json">

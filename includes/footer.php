@@ -127,6 +127,11 @@
   <button type="button" class="btn-floating btn-floating-help" id="btn-floating-help" aria-label="Open Help & Support panel">
     <i class="bi bi-chat-dots-fill"></i>
   </button>
+
+  <!-- GGB Sahayak Chatbot Launcher -->
+  <button type="button" class="btn-floating btn-floating-chatbot" id="btn-floating-chatbot" aria-label="Open GGB Sahayak chat assistant" aria-haspopup="dialog" aria-expanded="false">
+    <i class="bi bi-robot"></i>
+  </button>
 </div>
 
 <!-- Floating Help Panel -->
@@ -178,5 +183,6 @@
 <!-- Scripts (Local Only, Loaded with defer) -->
 <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js" defer></script>
 <script src="assets/js/main.js" defer></script>
+<script src="assets/js/chatbot.js" defer></script>
 </body>
 </html>
