@@ -77,11 +77,10 @@
 
     // Message shown when the question is clearly unrelated to the bank, or
     // when fewer than half its meaningful words exist anywhere on the site.
-    offTopicMessage: 'Sorry, that question is outside my scope. I can only answer ' +
-      'questions about Gujarat Gramin Bank using the information on this website.',
+    offTopicMessage: 'Sorry, that question is outside my scope.',
 
     // Message shown when the question is on-topic but nothing matches well enough.
-    notFoundMessage: "I couldn't find that on this website.",
+    notFoundMessage: "Sorry, this query is out of scope.",
 
     // Fraction of a question's meaningful words that must exist on the site
     // (directly, via synonym, or via typo-correction) or it is treated as
