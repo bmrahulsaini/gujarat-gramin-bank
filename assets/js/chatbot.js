@@ -27,7 +27,7 @@
      ============================================================================ */
   var CONFIG = {
     botName: 'GGB Sahayak',
-    subtitle: 'Answers from this website only',
+    subtitle: 'Here to answer your banking questions',
     footerNote: 'Please confirm important details at your branch.',
 
     // Launcher / panel element ids (created at runtime, kept here so nothing
@@ -36,9 +36,8 @@
     panelId: 'ggb-chat-panel',
 
     // First message shown when the panel opens for the very first time.
-    welcomeMessage: "Namaste! I'm GGB Sahayak. Ask me about deposits, loans, " +
-      'rates, branches or contact details - I only answer using information ' +
-      'already on this website.',
+    welcomeMessage: "I'm GGB Sahayak. I can help with deposits, loans, " +
+      'rates, branches and contact details.',
 
     // Quick-topic chips shown under the message area and on fallback replies.
     chips: [
@@ -58,20 +57,20 @@
       greeting: {
         phrases: ['hi', 'hii', 'hiii', 'hello', 'hey', 'hlo', 'namaste', 'namaskar',
           'good morning', 'good afternoon', 'good evening'],
-        reply: 'Hello! How can I help you with Gujarat Gramin Bank today?'
+        reply: 'Hello. How can I help you with Gujarat Gramin Bank?'
       },
       thanks: {
         phrases: ['thanks', 'thank you', 'thanku', 'thx', 'dhanyavad', 'aabhar', 'ok thanks'],
-        reply: "You're welcome! Is there anything else about GGB I can help with?"
+        reply: "You're welcome. Let me know if you have another question about GGB."
       },
       bye: {
         phrases: ['bye', 'goodbye', 'bye bye', 'see you', 'tata', 'ok bye'],
-        reply: 'Goodbye! Visit again if you have more questions about GGB.'
+        reply: 'Goodbye.'
       },
       about: {
         phrases: ['who are you', 'what are you', 'who r u', 'what is your name', 'tell me about yourself'],
-        reply: "I'm " + 'GGB Sahayak' + ', a website assistant that answers questions ' +
-          'about Gujarat Gramin Bank using only the information published on this site.'
+        reply: "I'm " + 'GGB Sahayak' + ', an assistant for Gujarat Gramin Bank. ' +
+          'I can help with deposits, loans, rates, branches and contact details.'
       }
     },
 
@@ -79,7 +78,7 @@
     // friendly templated reply (see `templates` below, which normally
     // supplies the actual wording shown for these two cases).
     offTopicMessage: 'Sorry, that question is outside my scope.',
-    notFoundMessage: "Sorry, I couldn't find that on this website.",
+    notFoundMessage: "Sorry, I don't have that information.",
 
     // Fraction of a question's meaningful words that must exist on the site
     // (directly, via synonym, or via typo-correction) or it is treated as
@@ -113,7 +112,7 @@
       'bank', 'banks', 'banking', 'gujarat', 'gramin', 'ggb', 'website', 'site', 'page',
       // English question/filler words
       'a', 'an', 'the', 'is', 'are', 'was', 'were', 'be', 'been', 'am',
-      'what', 'whats', 'which', 'who', 'whom', 'whose', 'where', 'when', 'why', 'how',
+      'what', 'whats', 'which', 'who', 'whom', 'whose', 'where', 'when', 'why', 'how', 'much', 'many',
       'do', 'does', 'did', 'can', 'could', 'will', 'would', 'shall', 'should', 'may', 'might',
       'of', 'for', 'to', 'in', 'on', 'at', 'by', 'with', 'about', 'from', 'into', 'onto',
       'i', 'me', 'my', 'mine', 'we', 'us', 'our', 'you', 'your', 'yours', 'it', 'its', 'this', 'that', 'these', 'those',
@@ -171,7 +170,8 @@
     // navigation/scripts/forms (per spec), the chatbot's own UI, and widgets
     // that only ever show live/demo numbers rather than real site facts.
     ignoreSelectors: [
-      'nav', 'script', 'style', 'noscript', 'form', 'svg', 'select', 'option', 'input', 'textarea',
+      'nav', 'script', 'style', 'noscript', 'form', 'svg',
+      'select', 'option', 'input', 'textarea', 'label', 'button',
       '[data-kb-ignore]',
       '#' + 'ggb-chat-panel', '.ggb-chat-launcher-wrap',
       '#calculator', // interactive EMI/FD tool - only shows demo numbers, not published rates
@@ -206,124 +206,84 @@
       wordDelayMs: 25      // delay between each revealed word
     },
 
-    // Friendly intro/outro sentences layered AROUND the factual content -
-    // they never change or add facts, only wording. One of each array is
-    // picked at random per reply. Keyed by topic:
-    //  - rates/branches/contact/general: wrap an actual answer found on the site
-    //  - chairman/board/charges: this content doesn't exist on the site today,
-    //    so these give a friendlier, topic-aware "not published here" voice
-    //    than the fully generic notFound/outOfScope fallbacks below
-    //  - notFound: on-topic question, but no topic-specific wording applies
-    //  - outOfScope: question is unrelated to the bank entirely
+    // Friendly intro/outro sentences layered AROUND factual content that WAS
+    // found - they never change or add facts, only wording. One of each
+    // array is picked at random per reply. Only for successful answers
+    // (rates/branches/contact/general); every "not found" / "out of scope"
+    // case instead uses the single flat notFoundMessage/offTopicMessage
+    // above, so a visitor always sees the exact same wording for the same
+    // kind of rejection rather than several differently-worded variants.
     templates: {
       rates: {
         intros: [
-          "Here's what I found about our rates:",
-          "Sure — here are the current rates on our site:",
-          "Good question! Here's the rate information published here:"
+          "Here is the rate information:",
+          "Here is the current rate:",
+          "Here is the rate detail:"
         ],
         outros: [
-          "Rates can change, so do confirm the latest figure at your branch.",
-          "Let me know if you'd like details on another product too!",
-          "Hope that helps — ask me about any other rate anytime."
+          "Rates are subject to change; confirm the current rate at your branch.",
+          "This rate may be revised; please verify before proceeding.",
+          "Confirm the current rate with your branch before deciding."
         ]
       },
       branches: {
         intros: [
-          "Here's what our site says about branches:",
-          "Sure, here's the branch information I found:",
-          "Here's what I could find on our branch network:"
+          "Here is the branch information:",
+          "Here is the branch detail:",
+          "Here is what I found about branches:"
         ],
         outros: [
           "You can also use the branch locator above to search by district.",
-          "Let me know if you need details for a specific branch.",
-          "Hope this points you in the right direction!"
-        ]
-      },
-      chairman: {
-        intros: [
-          "I looked, but our website doesn't publish the Chairman's name just yet.",
-          "That's not something this website lists right now.",
-          "I couldn't find Chairman details published on this site."
-        ],
-        outros: [
-          "You could check with your branch or the Contact section for the latest leadership details.",
-          "Try the Contact section below - they should be able to help with this.",
-          "Our Head Office contact details are a good place to ask about this."
-        ]
-      },
-      board: {
-        intros: [
-          "Our website doesn't currently list the Board of Directors.",
-          "I couldn't find Board of Directors details published here.",
-          "That information isn't published on this site at the moment."
-        ],
-        outros: [
-          "The Contact section below has our Head Office details if you'd like to ask directly.",
-          "You might find this in official bank notices at your branch.",
-          "Try reaching out through the Contact section for this one."
-        ]
-      },
-      charges: {
-        intros: [
-          "I couldn't find a full service charges schedule on this website.",
-          "Our site doesn't list a detailed fee/charges table right now.",
-          "That specific charge isn't published here yet."
-        ],
-        outros: [
-          "Your branch will have the latest official charges schedule.",
-          "For the exact figure, it's best to confirm with your branch.",
-          "I'd suggest checking with your branch for the up-to-date amount."
+          "A list of all branches is available via the locator above.",
+          "Contact a branch directly for further details."
         ]
       },
       contact: {
         intros: [
-          "Here's our contact information:",
-          "Sure, here's how you can reach us:",
-          "Here's what I found under Contact:"
+          "Here is the contact information:",
+          "Here are the contact details:",
+          "Here is how to reach the bank:"
         ],
         outros: [
-          "Feel free to reach out directly if you need more help!",
-          "Hope that gets you in touch with the right place.",
-          "Let me know if you need any other contact detail."
+          "This is the most current contact information available.",
+          "Contact the bank directly for further assistance.",
+          "Further contact details are in the Contact section."
         ]
       },
       general: {
         intros: [
-          "Here's what I found on our website:",
-          "Sure, here's the relevant information:",
-          "Here's what our site says about that:"
+          "Here is what I found about that:",
+          "Here is the relevant information:",
+          "Here is the relevant detail:"
         ],
         outros: [
-          "Let me know if you'd like more detail on anything here!",
-          "Hope that helps!",
-          "Feel free to ask me anything else about GGB."
-        ]
-      },
-      notFound: {
-        intros: [
-          "Hmm, I couldn't find that on this website.",
-          "I searched, but couldn't find a match for that on our site.",
-          "That doesn't seem to be covered on this website."
-        ],
-        outros: [
-          "Here are a few topics I can help with instead:",
-          "Maybe one of these would help:",
-          "You could try one of these topics:"
-        ]
-      },
-      outOfScope: {
-        intros: [
-          "Sorry, that's outside what I can help with.",
-          "That's a bit outside my scope, I'm afraid.",
-          "I'm only able to help with Gujarat Gramin Bank questions, so I can't answer that one."
-        ],
-        outros: [
-          "I can help with things like these instead:",
-          "Here's what I CAN help you with:\n",
-          "Try asking me about one of these:"
+          "Let me know if you need more detail.",
+          "You can ask about another topic.",
+          "Let me know if you have another question."
         ]
       }
+    },
+
+    // Sentence templates for DIRECT, intent-based answers (SECTION 8) - e.g.
+    // "head office phone number" composes exactly one sentence from a real
+    // scraped fact, instead of showing the whole section. {placeholders}
+    // are substituted with real values pulled from the page; wording here
+    // is the only thing that is ever "written" - every value slotted in is
+    // always copied straight from the site.
+    answerPhrases: {
+      phoneTollFree: 'You can reach us toll-free at {value}.',
+      phone: 'The {context} phone number is {value}.',
+      email: 'The {context} email is {value}.',
+      address: 'The {context} address is {value}.',
+      hours: 'Our {context} working hours are {value}.',
+      countBranchesWithDistricts: 'Gujarat Gramin Bank has {branches} branches across {districts} districts.',
+      countGeneric: '{label} is {value}.',
+      rateSpecific: '{product} interest rate is {value}.',
+      rateSpecificWithNote: '{product} interest rate is {value} ({note}).',
+      ifsc: 'The IFSC code for {branch} is {value}.',
+      branchSpecific: '{branch} ({district} district) - IFSC: {ifsc}, Phone: {phone}, Address: {address}.',
+      notFoundWithAlt: "I don't have {thing}. You can reach the bank at {alt}.",
+      notFoundPlain: "I don't have {thing}."
     }
   };
 
@@ -423,8 +383,10 @@
   var KB = {
     chunks: [],       // [{ text, sectionId, sectionTitle, heading, tag, pageUrl, pageTitle, pageKey }]
     rawVocab: {},      // raw lowercase words that literally appear on any indexed page
-    sectionTitles: {}  // "pageUrl::sectionId" -> human-readable title (per-page, so two
+    sectionTitles: {}, // "pageUrl::sectionId" -> human-readable title (per-page, so two
                         // pages reusing the same section id don't collide)
+    seenText: {}       // "pageUrl::lowercased text" -> true, so the exact same line is
+                        // never indexed twice from the same page
   };
 
   // Normalises a (possibly relative) URL and strips any #hash, so the same
@@ -494,6 +456,12 @@
     pageCtx = pageCtx || CURRENT_PAGE_CTX;
     var clean = text.replace(/\s+/g, ' ').trim();
     if (!clean || clean.length < 2) return;
+    // Icon/bullet-only noise ("• • • •", "-", "|") has no letters or digits at all.
+    if (!/[a-z0-9]/i.test(clean)) return;
+    // The exact same line, from the same page, is only ever indexed once.
+    var dedupKey = pageCtx.url + '::' + clean.toLowerCase();
+    if (KB.seenText[dedupKey]) return;
+    KB.seenText[dedupKey] = true;
     var sectionId = sectionEl && sectionEl.id ? sectionEl.id : 'page';
     var pageKey = pageCtx.url + '::' + sectionId;
     if (!KB.sectionTitles[pageKey]) KB.sectionTitles[pageKey] = computeSectionTitle(sectionEl, pageCtx.doc);
@@ -539,6 +507,12 @@
       });
       var line = (currentCategory ? currentCategory + ' - ' : '') + parts.join(' · ');
       addChunk(line, sectionEl, heading, 'table-row', pageCtx);
+      // Forward-compatible: no charges table exists on the site today, but
+      // the moment one is added under a "charges"/"fee"-ish heading, each
+      // row becomes a structured charge fact with no code changes needed.
+      if (/charge|fee/i.test(heading || '') && sectionEl && sectionEl.id) {
+        FACTS.charges.push({ text: line, context: cleanContextLabel(heading), sectionId: sectionEl.id });
+      }
     });
   }
 
@@ -619,6 +593,204 @@
     }
   }
 
+  /* ============================================================================
+     3c. STRUCTURED FACTS STORE
+     A second, parallel pass over the SAME page (current page only - fetched
+     other pages only get the generic KB.chunks/BM25 treatment from 3b) that
+     pulls out clean, typed facts instead of free text: a phone number is a
+     phone number, not just a chunk that happens to contain digits. SECTION 8
+     (intent detection) looks these up directly to answer the exact thing
+     asked; the generic KB.chunks/BM25 search is only a fallback for whatever
+     this layer doesn't recognise.
+     ============================================================================ */
+
+  var FACTS = {
+    phones: [],    // { number, context, sectionId }
+    emails: [],    // { email, context, sectionId }
+    addresses: [], // { text, context, sectionId }
+    hours: [],     // { text, context, sectionId }
+    people: [],    // { name, role, sectionId }
+    stats: [],     // { number, label, sub, sectionId }
+    rates: [],     // { product, category: 'deposit'|'loan', audience: 'general'|'senior', rateText, note, sectionId }
+    charges: [],   // { text, context, sectionId }
+    branches: []   // { name, district, ifsc, phone, address, sectionId }
+  };
+
+  // Indian landline ("0265-2361210"), toll-free ("1800-xxx-xxxx") or mobile
+  // (10-digit) number, optionally with a +91 prefix. Matches must contain at
+  // least 7 digits in total so short unrelated numbers (a year, a %) never
+  // get mistaken for a phone number.
+  var PHONE_REGEX = /(?:\+91[\s-]?)?(?:1800[\s-]?\d{2,3}[\s-]?\d{3,4}|\d{2,4}[\s-]\d{6,8}|\d{10})/g;
+  var EMAIL_REGEX = /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/ig;
+
+  function countDigits(s) { return (s.match(/\d/g) || []).length; }
+
+  // "Gujarat Gramin Bank Head Office" -> "Head Office"; "Toll Free / Call
+  // Centre:" -> "Toll Free / Call Centre". The bank's own name is already
+  // treated as filler everywhere else in this file - contexts get the same
+  // treatment so composed sentences read as "The Head Office phone..." per
+  // spec, not "The Gujarat Gramin Bank Head Office phone...".
+  function cleanContextLabel(label) {
+    return String(label || '')
+      .replace(/^(Gujarat Gramin Bank|GGB)\s+/i, '')
+      .replace(/:\s*$/, '')
+      .trim();
+  }
+
+  // Footer "Head Office & Support" column: one .footer-contact-item per
+  // address/phone/email, each built around a tel:/mailto: link or a <strong>
+  // name. Generic on purpose (keyed off the link type, not exact copy text).
+  function extractFooterContactFacts(pageCtx) {
+    var items = document.querySelectorAll('footer.ggb-footer .footer-contact-item');
+    items.forEach(function (item) {
+      var sectionId = 'footer-contact';
+      var fullText = item.textContent.replace(/\s+/g, ' ').trim();
+      var telLink = item.querySelector('a[href^="tel:"]');
+      var mailLink = item.querySelector('a[href^="mailto:"]');
+      if (telLink) {
+        var num = telLink.textContent.replace(/\s+/g, ' ').trim();
+        var label = cleanContextLabel(fullText.split(num)[0].replace(/:\s*$/, '')) || 'Contact';
+        FACTS.phones.push({ number: num, context: label, sectionId: sectionId });
+        var small = item.querySelector('small');
+        if (small && small.textContent.trim()) {
+          FACTS.hours.push({ text: small.textContent.replace(/\s+/g, ' ').trim(), context: label, sectionId: sectionId });
+        }
+      } else if (mailLink) {
+        var email = mailLink.textContent.replace(/\s+/g, ' ').trim();
+        var label2 = cleanContextLabel(fullText.replace(email, '').replace(/:\s*$/, '')) || 'Email';
+        FACTS.emails.push({ email: email, context: label2, sectionId: sectionId });
+      } else {
+        var strong = item.querySelector('strong');
+        var label3 = strong ? cleanContextLabel(strong.textContent) : 'Address';
+        var addrText = strong ? fullText.replace(strong.textContent, '').trim() : fullText;
+        if (addrText) FACTS.addresses.push({ text: addrText, context: label3 || 'Address', sectionId: sectionId });
+      }
+    });
+  }
+
+  // #branches .head-office-banner: heading + address paragraph + tel/mailto
+  // action links, all clearly labelled "Head Office" by the card itself.
+  function extractHeadOfficeBannerFacts(pageCtx) {
+    var banner = document.querySelector('.head-office-banner');
+    if (!banner) return;
+    var sectionId = 'branches';
+    var h3 = banner.querySelector('h3');
+    var label = h3 ? cleanContextLabel(h3.textContent) : 'Head Office';
+    var addrP = banner.querySelector('p');
+    if (addrP && addrP.textContent.trim()) {
+      FACTS.addresses.push({ text: addrP.textContent.replace(/\s+/g, ' ').trim(), context: label, sectionId: sectionId });
+    }
+    banner.querySelectorAll('a[href^="tel:"]').forEach(function (a) {
+      FACTS.phones.push({ number: a.textContent.replace(/\s+/g, ' ').trim(), context: label, sectionId: sectionId });
+    });
+    banner.querySelectorAll('a[href^="mailto:"]').forEach(function (a) {
+      FACTS.emails.push({ email: a.textContent.replace(/\s+/g, ' ').trim(), context: label, sectionId: sectionId });
+    });
+  }
+
+  // Broad safety net: scan the ALREADY-CLEANED chunks (post dedup/noise
+  // filtering) for any phone/email the two targeted extractors above might
+  // have missed (e.g. one mentioned inside an FAQ answer), tagged with that
+  // chunk's own heading as context.
+  function extractPhoneEmailFromChunks() {
+    KB.chunks.forEach(function (chunk) {
+      if (chunk.pageUrl !== CURRENT_PAGE_URL) return;
+      var phoneMatches = chunk.text.match(PHONE_REGEX) || [];
+      phoneMatches.forEach(function (m) {
+        if (countDigits(m) < 7) return;
+        FACTS.phones.push({ number: m.trim(), context: cleanContextLabel(chunk.heading), sectionId: chunk.sectionId });
+      });
+      var emailMatches = chunk.text.match(EMAIL_REGEX) || [];
+      emailMatches.forEach(function (m) {
+        FACTS.emails.push({ email: m, context: cleanContextLabel(chunk.heading), sectionId: chunk.sectionId });
+      });
+    });
+  }
+
+  // Forward-compatible, finds nothing on this site today (no Chairman/Board
+  // content exists) but will pick up "Name - Chairman" / "Name, Director"
+  // style text the moment any gets published, without code changes.
+  var PEOPLE_ROLE_REGEX = /^([A-Z][a-zA-Z.'\s]{2,40}?)\s*[-–,]\s*(Chairman|Vice[- ]Chairman|Managing Director|Director|CEO|CGM|General Manager)\b/;
+  function extractPeopleFromChunks() {
+    KB.chunks.forEach(function (chunk) {
+      if (chunk.pageUrl !== CURRENT_PAGE_URL) return;
+      var m = chunk.text.match(PEOPLE_ROLE_REGEX);
+      if (m) FACTS.people.push({ name: m[1].trim(), role: m[2].trim(), sectionId: chunk.sectionId });
+    });
+  }
+
+  // #about .stats-card: each has a .stats-number[data-target] (the real
+  // figure - its rendered text may still be mid count-up animation) plus a
+  // .stats-label and .stats-sub giving the figure its meaning.
+  function extractStatsFacts(pageCtx) {
+    document.querySelectorAll('.stats-card').forEach(function (card) {
+      var numEl = card.querySelector('.stats-number[data-target]');
+      if (!numEl) return;
+      var labelEl = card.querySelector('.stats-label');
+      var subEl = card.querySelector('.stats-sub');
+      FACTS.stats.push({
+        number: numEl.getAttribute('data-target') + (numEl.getAttribute('data-suffix') || ''),
+        label: labelEl ? labelEl.textContent.replace(/\s+/g, ' ').trim() : '',
+        sub: subEl ? subEl.textContent.replace(/\s+/g, ' ').trim() : '',
+        sectionId: 'about'
+      });
+    });
+  }
+
+  // #rates .rate-card: product name + headline % + unit text + note.
+  function extractRateFacts(pageCtx) {
+    document.querySelectorAll('#rates .rate-card').forEach(function (card) {
+      var nameEl = card.querySelector('.rate-product-name');
+      var valEl = card.querySelector('.rate-val');
+      if (!nameEl || !valEl) return;
+      var product = nameEl.textContent.replace(/\s+/g, ' ').trim();
+      var unitEl = card.querySelector('.rate-unit');
+      var noteEl = card.querySelector('.rate-note');
+      FACTS.rates.push({
+        product: product,
+        category: /loan|kisan|credit card/i.test(product) ? 'loan' : 'deposit',
+        audience: /senior/i.test(product) ? 'senior' : 'general',
+        rateText: (valEl.textContent.trim() + ' ' + (unitEl ? unitEl.textContent.trim() : '')).trim(),
+        note: noteEl ? noteEl.textContent.replace(/\s+/g, ' ').trim() : '',
+        sectionId: 'rates'
+      });
+    });
+  }
+
+  // Same gujaratBranches object buildFromBranchData() already reads for the
+  // generic chunk fallback - also kept here in structured form (name,
+  // district, IFSC, phone, address) so branch/IFSC intents can look a
+  // specific branch up directly instead of searching free text for it.
+  function extractBranchFacts() {
+    try {
+      if (typeof gujaratBranches !== 'object' || !gujaratBranches) return;
+      Object.keys(gujaratBranches).forEach(function (district) {
+        var list = gujaratBranches[district];
+        if (!Array.isArray(list)) return;
+        list.forEach(function (branch) {
+          FACTS.branches.push({
+            name: branch.name, district: district, ifsc: branch.ifsc,
+            phone: branch.phone, address: branch.address, sectionId: 'branches'
+          });
+        });
+      });
+    } catch (e) {
+      // main.js data shape changed or is unavailable - skipped, same as buildFromBranchData().
+    }
+  }
+
+  function buildFactsStore(pageCtx) {
+    FACTS.phones = []; FACTS.emails = []; FACTS.addresses = []; FACTS.hours = [];
+    FACTS.people = []; FACTS.stats = []; FACTS.rates = []; FACTS.charges = []; FACTS.branches = [];
+    extractFooterContactFacts(pageCtx);
+    extractHeadOfficeBannerFacts(pageCtx);
+    extractPhoneEmailFromChunks();   // after the targeted extractors, as a safety net only
+    extractPeopleFromChunks();
+    extractStatsFacts(pageCtx);
+    extractRateFacts(pageCtx);
+    extractBranchFacts();
+  }
+
   // Resets the KB and (re)builds it from ONLY the current page. Other pages'
   // chunks are merged in separately afterwards (from cache, then from the
   // background fetches) - see SECTION 3b.
@@ -626,9 +798,11 @@
     KB.chunks = [];
     KB.rawVocab = {};
     KB.sectionTitles = {};
+    KB.seenText = {};
     buildFromDom(document.getElementById('main-content'), CURRENT_PAGE_CTX);
     buildFromDom(document.querySelector('footer.ggb-footer'), CURRENT_PAGE_CTX);
     buildFromBranchData();
+    buildFactsStore(CURRENT_PAGE_CTX);
   }
 
   /* ============================================================================
@@ -1039,6 +1213,337 @@
     return { type: 'text', tag: tag, className: className || null, text: text, matchedTokens: matchedTokens || [], appendAfter: appendAfter || '' };
   }
 
+  /* ============================================================================
+     6b. INTENT DETECTION & DIRECT ANSWER COMPOSITION
+     Answers the EXACT thing asked, from the structured FACTS store (SECTION
+     3c), instead of showing a whole section. Runs after the hard off-topic
+     check (so "RBI repo rate" never reaches here) and before the generic
+     BM25 section search - which stays as the fallback for whenever nothing
+     here recognises the question (SECTION 5 of the task).
+     ============================================================================ */
+
+  function fillTemplate(tpl, vars) {
+    var out = tpl.replace(/\{(\w+)\}/g, function (_, k) {
+      return vars.hasOwnProperty(k) && vars[k] != null ? vars[k] : '';
+    });
+    // A value that already ends in a period (e.g. "p.a.") plus the
+    // template's own closing "." would otherwise read "p.a..".
+    return out.replace(/\.\.+$/, '.');
+  }
+
+  // "head office" / "customer care" / "toll free" - which labelled fact the
+  // question is actually asking about, so "head office number" and "toll
+  // free number" can resolve to different (or, here, the same) phone fact.
+  function detectOfficeContext(rawLower) {
+    if (/head\s*office/.test(rawLower)) return 'Head Office';
+    if (/customer\s*care|grievance|complaint|nodal/.test(rawLower)) return 'Customer Care';
+    if (/toll[\s-]?free|call\s*centre|call\s*center|helpline/.test(rawLower)) return 'Toll Free';
+    return null;
+  }
+
+  // Finds the best-matching fact for a detail label by substring-matching
+  // its words against each fact's `context`; with no detail, or no match,
+  // just returns the first fact of that type (there is only ever one real
+  // phone/email/address on this site anyway, so that is still correct).
+  function pickBestFact(facts, detail) {
+    if (!facts.length) return null;
+    if (detail) {
+      var words = detail.toLowerCase().split(/\s+/).filter(function (w) { return w.length > 2; });
+      var match = facts.filter(function (f) {
+        var ctx = (f.context || '').toLowerCase();
+        return words.some(function (w) { return ctx.indexOf(w) !== -1; });
+      })[0];
+      if (match) return match;
+    }
+    return facts[0];
+  }
+
+  // 'branches' or 'districts' - which stat the question wants a count of.
+  // Returns null (not 'branches') when the subject genuinely can't be told,
+  // so an unrelated "how many ___" question falls through to section search
+  // instead of being wrongly answered with the branch count.
+  function detectCountDetail(queryTokens, rawLower) {
+    if (queryTokens.indexOf('branch') !== -1) return 'branches';
+    if (/district/.test(rawLower)) return 'districts';
+    return null;
+  }
+
+  // A real district name mentioned in the question (checked against the
+  // districts FACTS.branches actually has data for), e.g. "Vadodara".
+  function detectDistrictDetail(rawLower) {
+    var found = null;
+    FACTS.branches.some(function (b) {
+      if (rawLower.indexOf(b.district.toLowerCase()) !== -1) { found = b.district; return true; }
+      return false;
+    });
+    return found;
+  }
+
+  // Fuzzy branch-name match: scores each branch by how many of ITS OWN name
+  // words (minus the generic word "branch" itself, which every branch name
+  // ends in and so carries no distinguishing signal) also appear in the
+  // question. Returns null below a minimum overlap, so a bare "branches"
+  // question never resolves to one arbitrary branch.
+  function findBestBranchByName(queryTokens) {
+    var best = null, bestScore = 0;
+    FACTS.branches.forEach(function (b) {
+      var nameTokens = tokenize(b.name).filter(function (t) { return t !== 'branch'; });
+      var overlap = nameTokens.filter(function (t) { return queryTokens.indexOf(t) !== -1; }).length;
+      if (overlap > bestScore) { bestScore = overlap; best = b; }
+    });
+    return bestScore >= 1 ? best : null;
+  }
+
+  // Appends a "View details" link and wraps everything into the same
+  // { kind:'answer', blocks, html, ... } shape the UI already knows how to
+  // render/animate - no separate rendering path needed for direct answers.
+  function finishDirectAnswer(leadBlocks, sectionId) {
+    var linkBlock = {
+      type: 'raw',
+      html: '<p class="ggb-chat-link-line"><a href="#' + escapeHtml(sectionId) + '" class="ggb-chat-jump" data-section="' +
+        escapeHtml(sectionId) + '">View details &rarr;</a></p>'
+    };
+    var blocks = leadBlocks.concat([linkBlock]);
+    var text = leadBlocks
+      .filter(function (b) { return b.type === 'text' || b.type === 'li'; })
+      .map(function (b) { return b.text; })
+      .join(' ');
+    return { kind: 'answer', text: text, html: blocksToStaticHtml(blocks), blocks: blocks, sectionId: sectionId, pageUrl: CURRENT_PAGE_URL };
+  }
+
+  // A recognised intent, but genuinely nothing to answer it with - names the
+  // exact thing asked for (per spec), and offers the toll-free/head-office
+  // phone as a concrete alternative when one is available. Never guesses.
+  function directNotFound(thingLabel, altPhoneFact) {
+    altPhoneFact = altPhoneFact === undefined ? pickBestFact(FACTS.phones, null) : altPhoneFact;
+    var sentence = altPhoneFact
+      ? fillTemplate(CONFIG.answerPhrases.notFoundWithAlt, { thing: thingLabel, alt: altPhoneFact.number })
+      : fillTemplate(CONFIG.answerPhrases.notFoundPlain, { thing: thingLabel });
+    var blocks = [textBlock('p', null, sentence), { type: 'raw', html: buildChipsHtml() }];
+    return { kind: 'nomatch', text: sentence, html: blocksToStaticHtml(blocks), blocks: blocks };
+  }
+
+  // An intent IS recognised (chairman, board, charges...) but there is no
+  // content for it on the site at all. Uses the single flat notFoundMessage
+  // - same wording every time, so a visitor always recognises "not found"
+  // regardless of what was asked, rather than several differently-worded
+  // "friendly" variants that can read as inconsistent to someone with
+  // limited English.
+  function notFoundWithTopicVoice() {
+    var blocks = [textBlock('p', null, CONFIG.notFoundMessage), { type: 'raw', html: buildChipsHtml() }];
+    return { kind: 'nomatch', text: CONFIG.notFoundMessage, html: blocksToStaticHtml(blocks), blocks: blocks };
+  }
+
+  function answerPhoneIntent(detail) {
+    var fact = pickBestFact(FACTS.phones, detail);
+    if (!fact) return directNotFound('that phone number');
+    var sentence;
+    if (/toll/i.test(fact.context)) sentence = fillTemplate(CONFIG.answerPhrases.phoneTollFree, { value: fact.number });
+    else if (detail) sentence = fillTemplate(CONFIG.answerPhrases.phone, { context: fact.context, value: fact.number });
+    else sentence = 'Our phone number is ' + fact.number + '.';
+    return finishDirectAnswer([textBlock('p', null, sentence)], fact.sectionId);
+  }
+
+  function answerEmailIntent(detail) {
+    var fact = pickBestFact(FACTS.emails, detail);
+    if (!fact) return directNotFound('that email address');
+    var sentence = /email/i.test(fact.context)
+      ? fact.context + ' is ' + fact.email + '.'
+      : fillTemplate(CONFIG.answerPhrases.email, { context: fact.context, value: fact.email });
+    return finishDirectAnswer([textBlock('p', null, sentence)], fact.sectionId);
+  }
+
+  function answerAddressIntent(detail) {
+    var fact = pickBestFact(FACTS.addresses, detail);
+    if (!fact) return directNotFound('that address');
+    var sentence = detail
+      ? fillTemplate(CONFIG.answerPhrases.address, { context: fact.context, value: fact.text })
+      : 'Our address is ' + fact.text + '.';
+    return finishDirectAnswer([textBlock('p', null, sentence)], fact.sectionId);
+  }
+
+  function answerHoursIntent(detail) {
+    var fact = pickBestFact(FACTS.hours, detail);
+    if (!fact) return directNotFound('our working hours');
+    var sentence = detail
+      ? fillTemplate(CONFIG.answerPhrases.hours, { context: fact.context, value: fact.text })
+      : 'Our working hours are ' + fact.text + '.';
+    return finishDirectAnswer([textBlock('p', null, sentence)], fact.sectionId);
+  }
+
+  function answerCountIntent(detail) {
+    if (detail === 'districts') {
+      var dStat = FACTS.stats.filter(function (s) { return /district/i.test(s.label); })[0];
+      if (!dStat) return directNotFound('that number');
+      var sentence1 = fillTemplate(CONFIG.answerPhrases.countGeneric, { label: dStat.label, value: dStat.number });
+      return finishDirectAnswer([textBlock('p', null, sentence1)], dStat.sectionId);
+    }
+    if (detail === 'branches') {
+      var bStat = FACTS.stats.filter(function (s) { return /branch/i.test(s.label); })[0];
+      var distStat = FACTS.stats.filter(function (s) { return /district/i.test(s.label); })[0];
+      if (bStat && distStat) {
+        var sentence2 = fillTemplate(CONFIG.answerPhrases.countBranchesWithDistricts, { branches: bStat.number, districts: distStat.number });
+        return finishDirectAnswer([textBlock('p', null, sentence2)], bStat.sectionId);
+      }
+      if (bStat) {
+        var sentence3 = fillTemplate(CONFIG.answerPhrases.countGeneric, { label: bStat.label, value: bStat.number });
+        return finishDirectAnswer([textBlock('p', null, sentence3)], bStat.sectionId);
+      }
+      if (FACTS.branches.length) {
+        var sentence4 = 'Gujarat Gramin Bank has at least ' + FACTS.branches.length + ' branches.';
+        return finishDirectAnswer([textBlock('p', null, sentence4)], 'branches');
+      }
+      return directNotFound('the branch count');
+    }
+    return null; // subject of the count genuinely unclear - let section search try
+  }
+
+  function answerWhoIntent(topicKey) {
+    var roleRegex = topicKey === 'board' ? /director|board/i : /chairman/i;
+    var person = FACTS.people.filter(function (p) { return roleRegex.test(p.role); })[0];
+    if (person) {
+      var sentence = person.name + ' is the ' + person.role + ' of Gujarat Gramin Bank.';
+      return finishDirectAnswer([textBlock('p', null, sentence)], person.sectionId);
+    }
+    return notFoundWithTopicVoice();
+  }
+
+  function answerIfscIntent(queryTokens) {
+    var branch = findBestBranchByName(queryTokens);
+    if (!branch) return directNotFound('that branch’s IFSC code');
+    var sentence = fillTemplate(CONFIG.answerPhrases.ifsc, { branch: branch.name, value: branch.ifsc });
+    return finishDirectAnswer([textBlock('p', null, sentence)], branch.sectionId);
+  }
+
+  function answerBranchLookupIntent(rawLower, queryTokens) {
+    var district = detectDistrictDetail(rawLower);
+    if (district) {
+      var inDistrict = FACTS.branches.filter(function (b) { return b.district === district; }).slice(0, 5);
+      if (!inDistrict.length) return directNotFound('branches in ' + district);
+      var lead1 = [textBlock('p', 'ggb-chat-answer-title', 'Branches in ' + district + ':')];
+      lead1.push({ type: 'ul-start', className: 'ggb-chat-answer-list' });
+      inDistrict.forEach(function (b) {
+        lead1.push({ type: 'li', text: b.name + ' - IFSC: ' + b.ifsc + ', Phone: ' + b.phone, matchedTokens: [] });
+      });
+      return finishDirectAnswer(lead1, 'branches');
+    }
+
+    var branch = findBestBranchByName(queryTokens);
+    if (branch) {
+      var sentence = fillTemplate(CONFIG.answerPhrases.branchSpecific, {
+        branch: branch.name, district: branch.district, ifsc: branch.ifsc, phone: branch.phone, address: branch.address
+      });
+      return finishDirectAnswer([textBlock('p', null, sentence)], branch.sectionId);
+    }
+
+    // No specific district/branch named - a clean curated sample (max 5)
+    // instead of the old noisy "Select Branch / Find Branch Details" UI text.
+    if (!FACTS.branches.length) return null;
+    var lead2 = [textBlock('p', 'ggb-chat-answer-title', 'A few of our branches:')];
+    lead2.push({ type: 'ul-start', className: 'ggb-chat-answer-list' });
+    FACTS.branches.slice(0, 5).forEach(function (b) {
+      lead2.push({ type: 'li', text: b.name + ' (' + b.district + ' district)', matchedTokens: [] });
+    });
+    return finishDirectAnswer(lead2, 'branches');
+  }
+
+  function answerRateIntent(category, queryTokens) {
+    var candidates = FACTS.rates.filter(function (r) { return r.category === category; });
+    if (!candidates.length) return null;
+
+    var descriptors = queryTokens.filter(function (t) {
+      return SPECIFIC_DESCRIPTORS.indexOf(t) !== -1 && t !== 'deposit' && t !== 'loan';
+    });
+    if (descriptors.length) {
+      var narrowed = candidates.filter(function (r) {
+        var pTokens = tokenize(r.product);
+        return descriptors.every(function (d) { return pTokens.indexOf(d) !== -1 || (d === 'senior' && r.audience === 'senior'); });
+      });
+      if (narrowed.length) {
+        var r = narrowed[0];
+        var sentence = fillTemplate(CONFIG.answerPhrases.rateSpecific, { product: r.product, value: r.rateText });
+        return finishDirectAnswer([textBlock('p', null, sentence)], r.sectionId);
+      }
+    }
+
+    // General ("loan rates"/"deposit rates") - a direct list, max 5 rows.
+    var lead = [textBlock('p', 'ggb-chat-answer-title', (category === 'loan' ? 'Loan' : 'Deposit') + ' interest rates:')];
+    lead.push({ type: 'ul-start', className: 'ggb-chat-answer-list' });
+    candidates.slice(0, 5).forEach(function (r) {
+      lead.push({ type: 'li', text: r.product + ': ' + r.rateText, matchedTokens: [] });
+    });
+    return finishDirectAnswer(lead, 'rates');
+  }
+
+  function answerChargeIntent() {
+    if (!FACTS.charges.length) return notFoundWithTopicVoice();
+    var match = FACTS.charges[0];
+    return finishDirectAnswer([textBlock('p', null, match.text)], match.sectionId);
+  }
+
+  var LOAN_TYPE_DESCRIPTORS = ['gold', 'home', 'vehicle', 'car', 'education', 'personal', 'msme', 'agri'];
+
+  // Tries every recognised intent in priority order (most specific first)
+  // and returns a ready-to-render answer result, or null when nothing here
+  // recognises the question at all - the caller then falls back to the
+  // generic BM25 section search exactly as before this feature existed.
+  function detectAndComposeDirectAnswer(question, rawWords, queryTokens) {
+    var rawLower = question.toLowerCase();
+
+    if (/\bifsc\b/.test(rawLower)) return answerIfscIntent(queryTokens);
+
+    if (/\bhow\s*many\b|\bhow\s*much\b|\bkitn[ei]\b|\bkitna\b/.test(rawLower)) {
+      var countResult = answerCountIntent(detectCountDetail(queryTokens, rawLower));
+      if (countResult) return countResult;
+    }
+
+    if (/\bwho\b|\bname\b|\bnaam\b/.test(rawLower)) {
+      var whoTopic = classifyTopic(queryTokens, null, rawWords);
+      if (whoTopic === 'chairman' || whoTopic === 'board') return answerWhoIntent(whoTopic);
+    }
+
+    if (/\baddress\b|\blocation\b|\bkahan\b/.test(rawLower)) {
+      return answerAddressIntent(detectOfficeContext(rawLower));
+    }
+
+    if (/\btiming|\bhours?\b|\bopen\b|\bclos/.test(rawLower)) {
+      return answerHoursIntent(detectOfficeContext(rawLower));
+    }
+
+    if (/\be-?mail\b/.test(rawLower)) {
+      return answerEmailIntent(detectOfficeContext(rawLower));
+    }
+
+    if (/\bphone\b|\bmobile\b|\bnumber\b|\bhelpline\b|\btoll[\s-]?free\b|\bcall\b|\bcontact\b/.test(rawLower)) {
+      return answerPhoneIntent(detectOfficeContext(rawLower));
+    }
+
+    if (queryTokens.indexOf('charge') !== -1) return answerChargeIntent();
+
+    if (queryTokens.indexOf('rate') !== -1) {
+      var wantsLoan = queryTokens.indexOf('loan') !== -1 ||
+        queryTokens.some(function (t) { return LOAN_TYPE_DESCRIPTORS.indexOf(t) !== -1; });
+      if (wantsLoan) {
+        var loanResult = answerRateIntent('loan', queryTokens);
+        if (loanResult) return loanResult;
+      }
+      var wantsDeposit = queryTokens.indexOf('deposit') !== -1 || queryTokens.indexOf('senior') !== -1 ||
+        queryTokens.indexOf('savings') !== -1 || queryTokens.indexOf('current') !== -1;
+      if (wantsDeposit) {
+        var depositResult = answerRateIntent('deposit', queryTokens);
+        if (depositResult) return depositResult;
+      }
+      // "rate" alone with no clear category - ambiguous, let section search try.
+    }
+
+    if (queryTokens.indexOf('branch') !== -1) {
+      var branchResult = answerBranchLookupIntent(rawLower, queryTokens);
+      if (branchResult) return branchResult;
+    }
+
+    return null;
+  }
+
   // Core entry point. Returns { html, text, kind, blocks } - never throws.
   // `blocks` is what the animated UI plays word-by-word; `html`/`text` are
   // the same reply pre-rendered flat, for the reduced-motion path and for
@@ -1076,8 +1581,19 @@
     // it below, even along branches that never reach the real search.
     var queryTokens = tokenize(trimmed);
 
-    // Off-topic check 1: curated trigger words (checked first, independent of coverage).
+    // Off-topic check 1: curated trigger words - always rejected outright,
+    // before intent detection even runs, so e.g. "RBI repo rate" can never
+    // be mistaken for a rates question just because "rate" is also in it.
     var hasOffTopicWord = rawWords.some(function (w) { return CONFIG.offTopicWords.indexOf(w) !== -1; });
+    if (hasOffTopicWord) {
+      var hardBlocks = [textBlock('p', null, CONFIG.offTopicMessage), { type: 'raw', html: buildChipsHtml() + buildContactLinkHtml() }];
+      return { kind: 'offtopic', text: CONFIG.offTopicMessage, html: blocksToStaticHtml(hardBlocks), blocks: hardBlocks };
+    }
+
+    // SECTION 6b: answer the exact thing asked, from the structured FACTS
+    // store, before ever falling back to a whole-section search.
+    var directResult = detectAndComposeDirectAnswer(trimmed, rawWords, queryTokens);
+    if (directResult) return directResult;
 
     var unknownWords = [];
     var knownCount = 0;
@@ -1087,50 +1603,19 @@
     });
     var coverage = knownCount / rawWords.length;
 
-    if (hasOffTopicWord || coverage < CONFIG.offTopicMinCoverage) {
-      // A question that genuinely names one of our known topics (e.g. "who
-      // is the chairman") still gets that topic's friendlier voice instead
-      // of the harsher, fully generic "outside my scope" one - but ONLY when
-      // low coverage is what flagged it. A curated off-topic trigger word
-      // (weather/repo/python/...) always gets the generic voice, even if
-      // some other word in the same question happens to overlap with a
-      // named topic (e.g. "RBI repo RATE" must not sound like a rates reply).
-      var offTopic = hasOffTopicWord ? null : classifyTopic(queryTokens, null, rawWords);
-      offTopic = offTopic || 'outOfScope';
-      var offTopicTpl = CONFIG.templates[offTopic] || CONFIG.templates.outOfScope;
-      var offTopicIntro = pickRandom(offTopicTpl.intros);
-      var offTopicOutro = pickRandom(offTopicTpl.outros);
-      var offTopicBlocks = [
-        textBlock('p', 'ggb-chat-intro-line', offTopicIntro),
-        textBlock('p', 'ggb-chat-outro-line', offTopicOutro),
-        { type: 'raw', html: buildChipsHtml() + buildContactLinkHtml() }
-      ];
-      return {
-        kind: 'offtopic',
-        text: offTopicIntro + ' ' + offTopicOutro,
-        html: blocksToStaticHtml(offTopicBlocks),
-        blocks: offTopicBlocks
-      };
+    if (coverage < CONFIG.offTopicMinCoverage) {
+      // Same flat message as any other off-topic rejection - a visitor
+      // should always see identical wording for "can't answer that",
+      // regardless of which words triggered it.
+      var offTopicBlocks = [textBlock('p', null, CONFIG.offTopicMessage), { type: 'raw', html: buildChipsHtml() + buildContactLinkHtml() }];
+      return { kind: 'offtopic', text: CONFIG.offTopicMessage, html: blocksToStaticHtml(offTopicBlocks), blocks: offTopicBlocks };
     }
 
     var results = searchAll(queryTokens);
 
     if (!results.length || results[0].score < CONFIG.matchScoreThreshold) {
-      var nomatchTopic = classifyTopic(queryTokens, null, rawWords) || 'notFound';
-      var nomatchTpl = CONFIG.templates[nomatchTopic] || CONFIG.templates.notFound;
-      var nomatchIntro = pickRandom(nomatchTpl.intros);
-      var nomatchOutro = pickRandom(nomatchTpl.outros);
-      var nomatchBlocks = [
-        textBlock('p', 'ggb-chat-intro-line', nomatchIntro),
-        textBlock('p', 'ggb-chat-outro-line', nomatchOutro),
-        { type: 'raw', html: buildChipsHtml() }
-      ];
-      return {
-        kind: 'nomatch',
-        text: nomatchIntro + ' ' + nomatchOutro,
-        html: blocksToStaticHtml(nomatchBlocks),
-        blocks: nomatchBlocks
-      };
+      var nomatchBlocks = [textBlock('p', null, CONFIG.notFoundMessage), { type: 'raw', html: buildChipsHtml() }];
+      return { kind: 'nomatch', text: CONFIG.notFoundMessage, html: blocksToStaticHtml(nomatchBlocks), blocks: nomatchBlocks };
     }
 
     var topChunk = results[0].chunk;
@@ -1181,7 +1666,7 @@
     var blocks = [];
     if (unknownWords.length) {
       blocks.push(textBlock('p', 'ggb-chat-unknown-note',
-        'I couldn’t find ‘' + unknownWords[0] + '’ on this website - showing the closest match instead.'));
+        'I couldn’t find ‘' + unknownWords[0] + '’ - showing the closest match instead.'));
     }
     blocks.push(textBlock('p', 'ggb-chat-intro-line', pickRandom(tpl.intros)));
     blocks.push(textBlock('p', 'ggb-chat-answer-title', sectionTitle, [], pageTagHtml));
@@ -1192,7 +1677,7 @@
     blocks.push({
       type: 'raw',
       html: '<p class="ggb-chat-link-line"><a href="' + escapeHtml(jumpHref) + '" class="ggb-chat-jump" data-section="' +
-        escapeHtml(topSectionId) + '"' + crossPageAttr + '>View on website &rarr;</a></p>'
+        escapeHtml(topSectionId) + '"' + crossPageAttr + '>View details &rarr;</a></p>'
     });
     blocks.push(textBlock('p', 'ggb-chat-outro-line', pickRandom(tpl.outros)));
 
@@ -1441,6 +1926,10 @@
     function done() {
       ui.busy = false;
       setInputEnabled(true);
+      // Disabling the input during the reply blurs it (disabled elements
+      // can't hold focus) - restore focus so the visitor can keep typing
+      // without having to click the input again.
+      if (ui.input) ui.input.focus();
     }
 
     if (prefersReducedMotion()) {
@@ -1514,6 +2003,9 @@
     if (!ui.greeted) {
       ui.greeted = true;
       appendMessage('bot', escapeHtml(CONFIG.welcomeMessage));
+      // The wave badge only needs to show until it's actually been noticed and used.
+      var waveBadge = document.querySelector('.ggb-wave-badge');
+      if (waveBadge) waveBadge.remove();
     }
     window.setTimeout(function () { if (ui.input) ui.input.focus(); }, 50);
   }
@@ -1534,6 +2026,15 @@
     var launcher = document.getElementById(CONFIG.launcherId);
     if (!launcher) return;
     launcher.setAttribute('aria-expanded', 'false');
+    // Attention cue: a waving-hand badge next to (not on) the bot icon,
+    // until the visitor actually opens the chat once (removed in
+    // openPanel()). Decorative only - never read by screen readers, never
+    // blocks clicks on the button itself.
+    var waveBadge = document.createElement('span');
+    waveBadge.className = 'ggb-wave-badge';
+    waveBadge.setAttribute('aria-hidden', 'true');
+    waveBadge.textContent = '👋';
+    launcher.appendChild(waveBadge);
     launcher.addEventListener('click', function (e) {
       e.stopPropagation();
       togglePanel();
