@@ -75,12 +75,11 @@
       }
     },
 
-    // Message shown when the question is clearly unrelated to the bank, or
-    // when fewer than half its meaningful words exist anywhere on the site.
+    // Fallback messages ONLY used if something goes wrong building the
+    // friendly templated reply (see `templates` below, which normally
+    // supplies the actual wording shown for these two cases).
     offTopicMessage: 'Sorry, that question is outside my scope.',
-
-    // Message shown when the question is on-topic but nothing matches well enough.
-    notFoundMessage: "Sorry, this query is out of scope.",
+    notFoundMessage: "Sorry, I couldn't find that on this website.",
 
     // Fraction of a question's meaningful words that must exist on the site
     // (directly, via synonym, or via typo-correction) or it is treated as
@@ -196,6 +195,135 @@
       maxPages: 25,
       // Abort a single page fetch that hangs longer than this (ms).
       fetchTimeoutMs: 8000
+    },
+
+    // "Typing..." + word-by-word reveal timing. Ignored entirely when the
+    // visitor's OS/browser requests prefers-reduced-motion - replies then
+    // appear instantly, with no dots and no streaming.
+    typingAnimation: {
+      minTypingMs: 400,   // shortest the "typing..." dots are shown for
+      maxTypingMs: 700,   // longest the "typing..." dots are shown for
+      wordDelayMs: 25      // delay between each revealed word
+    },
+
+    // Friendly intro/outro sentences layered AROUND the factual content -
+    // they never change or add facts, only wording. One of each array is
+    // picked at random per reply. Keyed by topic:
+    //  - rates/branches/contact/general: wrap an actual answer found on the site
+    //  - chairman/board/charges: this content doesn't exist on the site today,
+    //    so these give a friendlier, topic-aware "not published here" voice
+    //    than the fully generic notFound/outOfScope fallbacks below
+    //  - notFound: on-topic question, but no topic-specific wording applies
+    //  - outOfScope: question is unrelated to the bank entirely
+    templates: {
+      rates: {
+        intros: [
+          "Here's what I found about our rates:",
+          "Sure — here are the current rates on our site:",
+          "Good question! Here's the rate information published here:"
+        ],
+        outros: [
+          "Rates can change, so do confirm the latest figure at your branch.",
+          "Let me know if you'd like details on another product too!",
+          "Hope that helps — ask me about any other rate anytime."
+        ]
+      },
+      branches: {
+        intros: [
+          "Here's what our site says about branches:",
+          "Sure, here's the branch information I found:",
+          "Here's what I could find on our branch network:"
+        ],
+        outros: [
+          "You can also use the branch locator above to search by district.",
+          "Let me know if you need details for a specific branch.",
+          "Hope this points you in the right direction!"
+        ]
+      },
+      chairman: {
+        intros: [
+          "I looked, but our website doesn't publish the Chairman's name just yet.",
+          "That's not something this website lists right now.",
+          "I couldn't find Chairman details published on this site."
+        ],
+        outros: [
+          "You could check with your branch or the Contact section for the latest leadership details.",
+          "Try the Contact section below - they should be able to help with this.",
+          "Our Head Office contact details are a good place to ask about this."
+        ]
+      },
+      board: {
+        intros: [
+          "Our website doesn't currently list the Board of Directors.",
+          "I couldn't find Board of Directors details published here.",
+          "That information isn't published on this site at the moment."
+        ],
+        outros: [
+          "The Contact section below has our Head Office details if you'd like to ask directly.",
+          "You might find this in official bank notices at your branch.",
+          "Try reaching out through the Contact section for this one."
+        ]
+      },
+      charges: {
+        intros: [
+          "I couldn't find a full service charges schedule on this website.",
+          "Our site doesn't list a detailed fee/charges table right now.",
+          "That specific charge isn't published here yet."
+        ],
+        outros: [
+          "Your branch will have the latest official charges schedule.",
+          "For the exact figure, it's best to confirm with your branch.",
+          "I'd suggest checking with your branch for the up-to-date amount."
+        ]
+      },
+      contact: {
+        intros: [
+          "Here's our contact information:",
+          "Sure, here's how you can reach us:",
+          "Here's what I found under Contact:"
+        ],
+        outros: [
+          "Feel free to reach out directly if you need more help!",
+          "Hope that gets you in touch with the right place.",
+          "Let me know if you need any other contact detail."
+        ]
+      },
+      general: {
+        intros: [
+          "Here's what I found on our website:",
+          "Sure, here's the relevant information:",
+          "Here's what our site says about that:"
+        ],
+        outros: [
+          "Let me know if you'd like more detail on anything here!",
+          "Hope that helps!",
+          "Feel free to ask me anything else about GGB."
+        ]
+      },
+      notFound: {
+        intros: [
+          "Hmm, I couldn't find that on this website.",
+          "I searched, but couldn't find a match for that on our site.",
+          "That doesn't seem to be covered on this website."
+        ],
+        outros: [
+          "Here are a few topics I can help with instead:",
+          "Maybe one of these would help:",
+          "You could try one of these topics:"
+        ]
+      },
+      outOfScope: {
+        intros: [
+          "Sorry, that's outside what I can help with.",
+          "That's a bit outside my scope, I'm afraid.",
+          "I'm only able to help with Gujarat Gramin Bank questions, so I can't answer that one."
+        ],
+        outros: [
+          "I can help with things like these instead:",
+          "Here's what I CAN help you with:",
+          "Try asking me about one of these:"
+        ]
+      }
     }
   };
 
@@ -210,6 +338,20 @@
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#39;');
+  }
+
+  function pickRandom(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  // Whether the visitor's OS/browser has asked for reduced motion - the
+  // typing/word-reveal animation is skipped entirely when true.
+  function prefersReducedMotion() {
+    try {
+      return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    } catch (e) {
+      return false;
+    }
   }
 
   // Lightweight plural stemmer - good enough for the vocabulary on this site.
@@ -780,8 +922,14 @@
     return null;
   }
 
-  function highlight(text, matchedTokens) {
-    if (!matchedTokens.length) return escapeHtml(text);
+  // Splits `text` into an ordered array of HTML-safe fragments - each one
+  // either a run of whitespace, or a single word (escaped, and wrapped in
+  // <mark> when it matches one of `matchedTokens`). Used both to build the
+  // final static HTML (joined) and, by the UI, to stream the same words in
+  // one at a time without re-deriving the highlighting logic twice.
+  function highlightFragments(text, matchedTokens) {
+    if (!text) return [];
+    matchedTokens = matchedTokens || [];
     var words = text.split(/(\s+)/);
     return words.map(function (w) {
       if (/^\s+$/.test(w) || !w) return w;
@@ -789,7 +937,53 @@
       var norm = bare ? normalize(bare.toLowerCase()) : '';
       var isMatch = norm && matchedTokens.indexOf(norm) !== -1;
       return isMatch ? '<mark>' + escapeHtml(w) + '</mark>' : escapeHtml(w);
-    }).join('');
+    });
+  }
+
+  function highlight(text, matchedTokens) {
+    return highlightFragments(text, matchedTokens).join('');
+  }
+
+  // Groups highlightFragments() output into one "step" per word (a word plus
+  // any whitespace immediately after it), so the UI can reveal exactly one
+  // step every `wordDelayMs` - i.e. one word at a time, per spec.
+  function textToWordSteps(text, matchedTokens) {
+    var frags = highlightFragments(text, matchedTokens);
+    var steps = [];
+    var i = 0;
+    while (i < frags.length) {
+      var piece = frags[i++];
+      if (i < frags.length && /^\s+$/.test(frags[i])) { piece += frags[i]; i++; }
+      if (piece) steps.push(piece);
+    }
+    return steps;
+  }
+
+  // Which of the 6 named content topics (if any) this query/answer is about.
+  // Used purely to pick friendlier wording in CONFIG.templates - it never
+  // changes what counts as a match or what facts are shown. `rawWords`
+  // (optional) lets typo'd spellings of chairman/board still get their own
+  // topic voice even though those two have no site vocabulary to correct
+  // against (there's no "chairman" content to type-correct TOWARDS).
+  function classifyTopic(queryTokens, sectionId, rawWords) {
+    if (queryTokens.indexOf('chairman') !== -1) return 'chairman';
+    if (queryTokens.indexOf('board') !== -1) return 'board';
+    if (queryTokens.indexOf('charge') !== -1) return 'charges';
+    if (rawWords) {
+      for (var i = 0; i < rawWords.length; i++) {
+        var w = rawWords[i];
+        var maxDist = CONFIG.maxTypoDistance(w);
+        if (editDistance(w, 'chairman') <= maxDist) return 'chairman';
+        if (editDistance(w, 'board') <= maxDist || editDistance(w, 'director') <= maxDist) return 'board';
+      }
+    }
+    if (sectionId === 'rates') return 'rates';
+    if (sectionId === 'branches') return 'branches';
+    if (sectionId === 'footer-contact') return 'contact';
+    if (queryTokens.indexOf('branch') !== -1) return 'branches';
+    if (queryTokens.indexOf('rate') !== -1 || queryTokens.indexOf('deposit') !== -1 || queryTokens.indexOf('loan') !== -1) return 'rates';
+    if (queryTokens.indexOf('phone') !== -1) return 'contact';
+    return null;
   }
 
   function buildChipsHtml() {
@@ -818,31 +1012,69 @@
     }
   }
 
-  // Core entry point. Returns { html, text, kind } - never throws.
+  // Renders a block array into one flat HTML string - used for the instant
+  // (prefers-reduced-motion) path, the `.html` field, and console testing.
+  // The animated UI (SECTION 7) plays the exact same `blocks` itself instead
+  // of re-parsing this string, so both paths always render identically.
+  function blocksToStaticHtml(blocks) {
+    var out = '';
+    var inList = false;
+    function closeListIfOpen() { if (inList) { out += '</ul>'; inList = false; } }
+    blocks.forEach(function (b) {
+      if (b.type === 'ul-start') { closeListIfOpen(); out += '<ul class="' + b.className + '">'; inList = true; return; }
+      if (b.type === 'li') { out += '<li>' + highlight(b.text, b.matchedTokens || []) + '</li>'; return; }
+      closeListIfOpen();
+      if (b.type === 'raw') { out += b.html; return; }
+      if (b.type === 'text') {
+        var inner = (b.matchedTokens && b.matchedTokens.length) ? highlight(b.text, b.matchedTokens) : escapeHtml(b.text);
+        out += '<' + b.tag + (b.className ? ' class="' + b.className + '"' : '') + '>' + inner + (b.appendAfter || '') + '</' + b.tag + '>';
+        return;
+      }
+    });
+    closeListIfOpen();
+    return out;
+  }
+
+  function textBlock(tag, className, text, matchedTokens, appendAfter) {
+    return { type: 'text', tag: tag, className: className || null, text: text, matchedTokens: matchedTokens || [], appendAfter: appendAfter || '' };
+  }
+
+  // Core entry point. Returns { html, text, kind, blocks } - never throws.
+  // `blocks` is what the animated UI plays word-by-word; `html`/`text` are
+  // the same reply pre-rendered flat, for the reduced-motion path and for
+  // console testing (e.g. GGBChatbot.answer("fd rates")).
   function answer(question) {
     try {
       return answerInternal(String(question || ''));
     } catch (e) {
-      return { kind: 'error', text: CONFIG.notFoundMessage, html: escapeHtml(CONFIG.notFoundMessage) + buildChipsHtml() };
+      var blocks = [textBlock('p', null, CONFIG.notFoundMessage), { type: 'raw', html: buildChipsHtml() }];
+      return { kind: 'error', text: CONFIG.notFoundMessage, html: blocksToStaticHtml(blocks), blocks: blocks };
     }
   }
 
   function answerInternal(question) {
     var trimmed = question.trim();
     if (!trimmed) {
-      return { kind: 'empty', text: 'Please type a question.', html: 'Please type a question to get started.' + buildChipsHtml() };
+      var emptyBlocks = [textBlock('p', null, 'Please type a question to get started.'), { type: 'raw', html: buildChipsHtml() }];
+      return { kind: 'empty', text: 'Please type a question.', html: blocksToStaticHtml(emptyBlocks), blocks: emptyBlocks };
     }
 
     var smallTalkReply = matchSmallTalk(trimmed);
     if (smallTalkReply) {
-      return { kind: 'smalltalk', text: smallTalkReply, html: escapeHtml(smallTalkReply) };
+      var stBlocks = [textBlock('p', null, smallTalkReply)];
+      return { kind: 'smalltalk', text: smallTalkReply, html: blocksToStaticHtml(stBlocks), blocks: stBlocks };
     }
 
     var rawWords = splitWords(trimmed).filter(function (w) { return !FILLER_SET[w]; });
 
     if (!rawWords.length) {
-      return { kind: 'unclear', text: CONFIG.notFoundMessage, html: escapeHtml(CONFIG.notFoundMessage) + buildChipsHtml() };
+      var unclearBlocks = [textBlock('p', null, CONFIG.notFoundMessage), { type: 'raw', html: buildChipsHtml() }];
+      return { kind: 'unclear', text: CONFIG.notFoundMessage, html: blocksToStaticHtml(unclearBlocks), blocks: unclearBlocks };
     }
+
+    // Tokenised early so topic classification (for template wording) can use
+    // it below, even along branches that never reach the real search.
+    var queryTokens = tokenize(trimmed);
 
     // Off-topic check 1: curated trigger words (checked first, independent of coverage).
     var hasOffTopicWord = rawWords.some(function (w) { return CONFIG.offTopicWords.indexOf(w) !== -1; });
@@ -856,28 +1088,49 @@
     var coverage = knownCount / rawWords.length;
 
     if (hasOffTopicWord || coverage < CONFIG.offTopicMinCoverage) {
+      // A question that genuinely names one of our known topics (e.g. "who
+      // is the chairman") still gets that topic's friendlier voice instead
+      // of the harsher, fully generic "outside my scope" one - but ONLY when
+      // low coverage is what flagged it. A curated off-topic trigger word
+      // (weather/repo/python/...) always gets the generic voice, even if
+      // some other word in the same question happens to overlap with a
+      // named topic (e.g. "RBI repo RATE" must not sound like a rates reply).
+      var offTopic = hasOffTopicWord ? null : classifyTopic(queryTokens, null, rawWords);
+      offTopic = offTopic || 'outOfScope';
+      var offTopicTpl = CONFIG.templates[offTopic] || CONFIG.templates.outOfScope;
+      var offTopicIntro = pickRandom(offTopicTpl.intros);
+      var offTopicOutro = pickRandom(offTopicTpl.outros);
+      var offTopicBlocks = [
+        textBlock('p', 'ggb-chat-intro-line', offTopicIntro),
+        textBlock('p', 'ggb-chat-outro-line', offTopicOutro),
+        { type: 'raw', html: buildChipsHtml() + buildContactLinkHtml() }
+      ];
       return {
         kind: 'offtopic',
-        text: CONFIG.offTopicMessage,
-        html: escapeHtml(CONFIG.offTopicMessage) + buildChipsHtml() + buildContactLinkHtml()
+        text: offTopicIntro + ' ' + offTopicOutro,
+        html: blocksToStaticHtml(offTopicBlocks),
+        blocks: offTopicBlocks
       };
     }
 
-    var queryTokens = tokenize(trimmed);
     var results = searchAll(queryTokens);
 
     if (!results.length || results[0].score < CONFIG.matchScoreThreshold) {
+      var nomatchTopic = classifyTopic(queryTokens, null, rawWords) || 'notFound';
+      var nomatchTpl = CONFIG.templates[nomatchTopic] || CONFIG.templates.notFound;
+      var nomatchIntro = pickRandom(nomatchTpl.intros);
+      var nomatchOutro = pickRandom(nomatchTpl.outros);
+      var nomatchBlocks = [
+        textBlock('p', 'ggb-chat-intro-line', nomatchIntro),
+        textBlock('p', 'ggb-chat-outro-line', nomatchOutro),
+        { type: 'raw', html: buildChipsHtml() }
+      ];
       return {
         kind: 'nomatch',
-        text: CONFIG.notFoundMessage,
-        html: escapeHtml(CONFIG.notFoundMessage) + buildChipsHtml()
+        text: nomatchIntro + ' ' + nomatchOutro,
+        html: blocksToStaticHtml(nomatchBlocks),
+        blocks: nomatchBlocks
       };
-    }
-
-    var unknownNote = '';
-    if (unknownWords.length) {
-      unknownNote = '<p class="ggb-chat-unknown-note">I couldn\'t find ‘' +
-        escapeHtml(unknownWords[0]) + '’ on this website - showing the closest match instead.</p>';
     }
 
     var topChunk = results[0].chunk;
@@ -912,10 +1165,6 @@
 
     lines = lines.slice(0, CONFIG.maxAnswerLines);
 
-    var linesHtml = lines.map(function (r) {
-      return '<li>' + highlight(r.chunk.text, queryTokens) + '</li>';
-    }).join('');
-
     // A chunk from another page links to "page.php#section" (a normal
     // navigation, letting the browser jump to the anchor on arrival);
     // a chunk from THIS page keeps the in-page smooth-scroll+highlight link.
@@ -926,16 +1175,32 @@
       : '';
     var crossPageAttr = isCrossPage ? ' data-cross-page="1"' : '';
 
-    var html = unknownNote +
-      '<p class="ggb-chat-answer-title">' + escapeHtml(sectionTitle) + pageTagHtml + '</p>' +
-      '<ul class="ggb-chat-answer-list">' + linesHtml + '</ul>' +
-      '<p class="ggb-chat-link-line"><a href="' + escapeHtml(jumpHref) + '" class="ggb-chat-jump" data-section="' +
-      escapeHtml(topSectionId) + '"' + crossPageAttr + '>View on website &rarr;</a></p>';
+    var topic = classifyTopic(queryTokens, topSectionId) || 'general';
+    var tpl = CONFIG.templates[topic] || CONFIG.templates.general;
+
+    var blocks = [];
+    if (unknownWords.length) {
+      blocks.push(textBlock('p', 'ggb-chat-unknown-note',
+        'I couldn’t find ‘' + unknownWords[0] + '’ on this website - showing the closest match instead.'));
+    }
+    blocks.push(textBlock('p', 'ggb-chat-intro-line', pickRandom(tpl.intros)));
+    blocks.push(textBlock('p', 'ggb-chat-answer-title', sectionTitle, [], pageTagHtml));
+    blocks.push({ type: 'ul-start', className: 'ggb-chat-answer-list' });
+    lines.forEach(function (r) {
+      blocks.push({ type: 'li', text: r.chunk.text, matchedTokens: queryTokens });
+    });
+    blocks.push({
+      type: 'raw',
+      html: '<p class="ggb-chat-link-line"><a href="' + escapeHtml(jumpHref) + '" class="ggb-chat-jump" data-section="' +
+        escapeHtml(topSectionId) + '"' + crossPageAttr + '>View on website &rarr;</a></p>'
+    });
+    blocks.push(textBlock('p', 'ggb-chat-outro-line', pickRandom(tpl.outros)));
 
     return {
       kind: 'answer',
       text: lines.map(function (r) { return r.chunk.text; }).join(' / '),
-      html: html,
+      html: blocksToStaticHtml(blocks),
+      blocks: blocks,
       sectionId: topSectionId,
       pageUrl: topPageUrl
     };
@@ -945,7 +1210,7 @@
      7. UI - launcher wiring + panel built and injected at runtime.
      ============================================================================ */
 
-  var ui = { panel: null, messages: null, input: null, opened: false, greeted: false };
+  var ui = { panel: null, messages: null, input: null, sendBtn: null, opened: false, greeted: false, busy: false };
 
   function buildPanelHtml() {
     return (
@@ -961,7 +1226,7 @@
       '<form class="ggb-chat-input-row" id="ggb-chat-form">' +
         '<label for="ggb-chat-input" class="visually-hidden">Type your question</label>' +
         '<input type="text" id="ggb-chat-input" class="ggb-chat-input" placeholder="Ask about deposits, loans, branches..." autocomplete="off">' +
-        '<button type="submit" class="ggb-chat-send" aria-label="Send question"><i class="bi bi-send-fill"></i></button>' +
+        '<button type="submit" class="ggb-chat-send" id="ggb-chat-send-btn" aria-label="Send question"><i class="bi bi-send-fill"></i></button>' +
       '</form>' +
       '<p class="ggb-chat-footnote">' + escapeHtml(CONFIG.footerNote) + '</p>'
     );
@@ -987,16 +1252,158 @@
     appendMessage('user', escapeHtml(text));
   }
 
+  // Disables the text input, send button and every chip (current chips row
+  // AND any chips rendered inside a reply) while a message is being typed
+  // or streamed, so a visitor can't pile up overlapping requests.
+  function setInputEnabled(enabled) {
+    if (ui.input) ui.input.disabled = !enabled;
+    if (ui.sendBtn) ui.sendBtn.disabled = !enabled;
+    if (ui.panel) ui.panel.classList.toggle('ggb-chat-busy', !enabled);
+  }
+
   function showTyping(callback) {
     var row = document.createElement('div');
     row.className = 'ggb-chat-msg ggb-chat-msg-bot ggb-chat-typing';
     row.innerHTML = '<div class="ggb-chat-bubble"><span class="ggb-chat-dot"></span><span class="ggb-chat-dot"></span><span class="ggb-chat-dot"></span></div>';
     ui.messages.appendChild(row);
     scrollMessagesToEnd();
+    var cfg = CONFIG.typingAnimation;
+    var delay = cfg.minTypingMs + Math.random() * (cfg.maxTypingMs - cfg.minTypingMs);
     window.setTimeout(function () {
       row.remove();
       callback();
-    }, 550);
+    }, delay);
+  }
+
+  // Instant render - used when prefers-reduced-motion is set. Produces
+  // exactly the same markup the animated player would have ended up with.
+  function renderBotMessageStatic(result) {
+    appendMessage('bot', result.html);
+  }
+
+  // Plays `result.blocks` into a new bot bubble: typing cursor + word-by-word
+  // reveal for prose, one list item at a time for facts, honouring the exact
+  // per-block HTML a static render would produce. Clicking the bubble at any
+  // point jumps straight to the finished message. Calls `onComplete` once
+  // the whole reply (or the instant skip-to-end) has been rendered.
+  function renderBotMessageAnimated(result, onComplete) {
+    var row = document.createElement('div');
+    row.className = 'ggb-chat-msg ggb-chat-msg-bot';
+    var bubble = document.createElement('div');
+    bubble.className = 'ggb-chat-bubble';
+    row.appendChild(bubble);
+    ui.messages.appendChild(row);
+    scrollMessagesToEnd();
+
+    var blocks = result.blocks || [];
+    var currentList = null;
+    var skipped = false;
+    var activeCancel = null;
+
+    function onBubbleClick() {
+      skipped = true;
+      if (activeCancel) activeCancel();
+    }
+    bubble.addEventListener('click', onBubbleClick);
+
+    function appendBlockStatic(block) {
+      if (block.type === 'ul-start') {
+        var ul = document.createElement('ul');
+        ul.className = block.className;
+        bubble.appendChild(ul);
+        currentList = ul;
+        return;
+      }
+      if (block.type === 'raw') { bubble.insertAdjacentHTML('beforeend', block.html); return; }
+      if (block.type === 'li') {
+        var li = document.createElement('li');
+        li.innerHTML = highlight(block.text, block.matchedTokens || []);
+        (currentList || bubble).appendChild(li);
+        return;
+      }
+      var el = document.createElement(block.tag || 'p');
+      if (block.className) el.className = block.className;
+      var inner = (block.matchedTokens && block.matchedTokens.length) ? highlight(block.text, block.matchedTokens) : escapeHtml(block.text);
+      el.innerHTML = inner + (block.appendAfter || '');
+      bubble.appendChild(el);
+    }
+
+    // Reveals `text` into `el` one word at a time (already-highlighted, via
+    // the same fragments blocksToStaticHtml() would use), with a blinking
+    // cursor trailing the revealed text, scrolling to bottom on every word.
+    function streamInto(el, text, matchedTokens, onDone) {
+      var steps = textToWordSteps(text, matchedTokens);
+      var idx = 0;
+      var cursor = document.createElement('span');
+      cursor.className = 'ggb-chat-cursor';
+      el.appendChild(cursor);
+      var timer = null;
+      activeCancel = function () {
+        window.clearTimeout(timer);
+        cursor.remove();
+        el.insertAdjacentHTML('beforeend', steps.slice(idx).join(''));
+        activeCancel = null;
+        onDone();
+      };
+      function tick() {
+        if (idx >= steps.length) { cursor.remove(); activeCancel = null; onDone(); return; }
+        cursor.insertAdjacentHTML('beforebegin', steps[idx]);
+        idx++;
+        scrollMessagesToEnd();
+        timer = window.setTimeout(tick, CONFIG.typingAnimation.wordDelayMs);
+      }
+      tick();
+    }
+
+    var i = 0;
+    function playNext() {
+      if (skipped) {
+        for (; i < blocks.length; i++) appendBlockStatic(blocks[i]);
+        finish();
+        return;
+      }
+      if (i >= blocks.length) { finish(); return; }
+      var block = blocks[i++];
+
+      if (block.type === 'ul-start') {
+        var ul = document.createElement('ul');
+        ul.className = block.className;
+        bubble.appendChild(ul);
+        currentList = ul;
+        scrollMessagesToEnd();
+        playNext();
+        return;
+      }
+      if (block.type === 'raw') {
+        bubble.insertAdjacentHTML('beforeend', block.html);
+        scrollMessagesToEnd();
+        playNext();
+        return;
+      }
+      if (block.type === 'li') {
+        // List items/rows appear one by one: each is its own streamed block.
+        var li = document.createElement('li');
+        (currentList || bubble).appendChild(li);
+        streamInto(li, block.text, block.matchedTokens, playNext);
+        return;
+      }
+      // block.type === 'text'
+      var el = document.createElement(block.tag || 'p');
+      if (block.className) el.className = block.className;
+      bubble.appendChild(el);
+      streamInto(el, block.text, block.matchedTokens, function () {
+        if (block.appendAfter) el.insertAdjacentHTML('beforeend', block.appendAfter);
+        playNext();
+      });
+    }
+
+    function finish() {
+      bubble.removeEventListener('click', onBubbleClick);
+      scrollMessagesToEnd();
+      onComplete();
+    }
+
+    playNext();
   }
 
   function jumpToSection(sectionId) {
@@ -1008,18 +1415,34 @@
   }
 
   function handleAsk(question) {
-    if (!question.trim()) return;
+    if (ui.busy || !question.trim()) return;
     appendUserMessage(question);
     if (ui.input) ui.input.value = '';
+
+    var result = answer(question);
+    ui.busy = true;
+    setInputEnabled(false);
+
+    function done() {
+      ui.busy = false;
+      setInputEnabled(true);
+    }
+
+    if (prefersReducedMotion()) {
+      renderBotMessageStatic(result);
+      done();
+      return;
+    }
+
     showTyping(function () {
-      var result = answer(question);
-      appendMessage('bot', result.html);
+      renderBotMessageAnimated(result, done);
     });
   }
 
   function wirePanelEvents() {
     ui.messages = document.getElementById('ggb-chat-messages');
     ui.input = document.getElementById('ggb-chat-input');
+    ui.sendBtn = document.getElementById('ggb-chat-send-btn');
 
     var closeBtn = document.getElementById('ggb-chat-close-btn');
     closeBtn.addEventListener('click', closePanel);

@@ -106,6 +106,8 @@
 .ggb-chat-messages {
   flex: 1 1 auto;
   overflow-y: auto;
+  overflow-anchor: none;
+  scroll-behavior: smooth;
   padding: 1rem;
   display: flex;
   flex-direction: column;
@@ -194,6 +196,58 @@
   color: var(--ggb-muted);
   font-style: italic;
   margin-bottom: 0.5rem;
+}
+
+/* Friendly wrapper sentences around the facts (CONFIG.templates) */
+.ggb-chat-intro-line {
+  margin: 0 0 0.5rem 0;
+}
+
+.ggb-chat-outro-line {
+  margin: 0.5rem 0 0 0;
+  color: var(--ggb-text-secondary);
+}
+
+/* Trailing blinking cursor shown at the end of text currently streaming in */
+.ggb-chat-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-left: 1px;
+  vertical-align: text-bottom;
+  background: var(--ggb-navy);
+  animation: ggbChatCursorBlink 0.9s step-start infinite;
+}
+
+@keyframes ggbChatCursorBlink {
+  50% { opacity: 0; }
+}
+
+/* A message currently being typed/streamed invites a click to skip it */
+.ggb-chat-msg-bot .ggb-chat-bubble {
+  cursor: text;
+}
+
+/* Disabled while a reply is being typed/streamed - covers the main input,
+   send button, and every chip (chips row + any chips inside a reply). */
+.ggb-chat-input:disabled,
+.ggb-chat-send:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.ggb-chat-busy .ggb-chat-chip {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* prefers-reduced-motion: the dots/cursor never animate (JS also skips the
+   whole typing/streaming sequence and renders the reply instantly). */
+@media (prefers-reduced-motion: reduce) {
+  .ggb-chat-dot,
+  .ggb-chat-cursor {
+    animation: none;
+  }
 }
 
 .ggb-chat-link-line {
