@@ -1,0 +1,79 @@
+/* ==========================================================================
+   GUJARAT GRAMIN BANK - LOCAL FONTS
+   Self-hosted WOFF2 fonts with font-display: swap
+   ========================================================================== */
+
+/* Plus Jakarta Sans (English) */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/plus-jakarta-sans/plus-jakarta-sans-400.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../fonts/plus-jakarta-sans/plus-jakarta-sans-500.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../fonts/plus-jakarta-sans/plus-jakarta-sans-600.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../fonts/plus-jakarta-sans/plus-jakarta-sans-700.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url('../fonts/plus-jakarta-sans/plus-jakarta-sans-800.woff2') format('woff2');
+}
+
+/* Noto Sans Gujarati */
+@font-face {
+  font-family: 'Noto Sans Gujarati';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/noto-sans-gujarati/noto-sans-gujarati-400.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Noto Sans Gujarati';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../fonts/noto-sans-gujarati/noto-sans-gujarati-600.woff2') format('woff2');
+}
+
+/* Noto Sans Devanagari (Hindi) */
+@font-face {
+  font-family: 'Noto Sans Devanagari';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/noto-sans-devanagari/noto-sans-devanagari-400.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Noto Sans Devanagari';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../fonts/noto-sans-devanagari/noto-sans-devanagari-600.woff2') format('woff2');
+}

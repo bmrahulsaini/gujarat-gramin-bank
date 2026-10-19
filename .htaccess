@@ -1,0 +1,70 @@
+# ==============================================================================
+# GUJARAT GRAMIN BANK - APACHE CONFIGURATION (.htaccess)
+# ==============================================================================
+
+# Disable directory browsing
+Options -Indexes
+
+# Set default directory index
+DirectoryIndex index.php
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Redirect direct requests for index.php to directory root (avoid exposing .php)
+  RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ (?:/[^/\s]+)*/index\.php [NC]
+  RewriteRule ^index\.php$ ./ [R=301,L,NE]
+</IfModule>
+
+# Custom 404 Error page
+ErrorDocument 404 /404.php
+
+# Block access to sensitive files and folders
+<FilesMatch "(^\.|\.(env|log|md|git|json|lock|sql|bak|config)$)">
+  Require all denied
+</FilesMatch>
+
+# Block direct access to includes folder
+<If "%{REQUEST_URI} =~ m#^/(?:.*/)?includes/#">
+  Require all denied
+</If>
+
+# Allow only index.php and 404.php execution directly
+<FilesMatch "\.php$">
+  <RequireAny>
+    Require expr "%{REQUEST_URI} =~ m#/(index|404)\.php$#"
+    Require expr "%{THE_REQUEST} =~ m#/(index|404)\.php#"
+  </RequireAny>
+</FilesMatch>
+
+# Security Headers
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set X-XSS-Protection "1; mode=block"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=()"
+  # Self-contained CSP (no CDNs, only local assets and data URIs)
+  Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; object-src 'none';"
+</IfModule>
+
+# Compression for text, css, javascript, svg
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json image/svg+xml
+</IfModule>
+
+# Browser Caching for Assets
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresDefault "access plus 1 month"
+  ExpiresByType text/html "access plus 0 seconds"
+  ExpiresByType text/css "access plus 1 year"
+  ExpiresByType application/javascript "access plus 1 year"
+  ExpiresByType image/webp "access plus 1 year"
+  ExpiresByType image/jpeg "access plus 1 year"
+  ExpiresByType image/png "access plus 1 year"
+  ExpiresByType image/svg+xml "access plus 1 year"
+  ExpiresByType font/woff2 "access plus 1 year"
+  ExpiresByType font/woff "access plus 1 year"
+  ExpiresByType image/x-icon "access plus 1 year"
+</IfModule>

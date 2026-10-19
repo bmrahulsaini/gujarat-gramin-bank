@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 80" width="420" height="80" fill="none" role="img" aria-label="Gujarat Gramin Bank Logo">
+  <g id="logo-emblem" transform="translate(10, 6)">
+    <!-- Base Glow & Aura -->
+    <circle cx="34" cy="34" r="33" fill="#E8F5EC" opacity="0.6"/>
+    <circle cx="34" cy="34" r="31" fill="#FFFFFF" stroke="#E3E8EF" stroke-width="1"/>
+    
+    <!-- Outer Trust Wing/Hand (Deep Navy) -->
+    <path d="M 22 49 C 17 44 14 36 15 28 C 16 20 22 13 32 9 C 27 15 25 24 27 33 C 28 39 32 44 36 48 C 30 49 25 50 22 49 Z" fill="#0B2D5B"/>
+    
+    <!-- Growth Leaf / Wing (Vibrant Green) -->
+    <path d="M 46 49 C 51 44 54 36 53 28 C 52 20 46 13 36 9 C 41 15 43 24 41 33 C 40 39 36 44 32 48 C 38 49 43 50 46 49 Z" fill="#1F8A4C"/>
+    
+    <!-- Central Upward Growth Arrow & Stem (Deep Navy) -->
+    <path d="M 34 8 L 40 18 L 36 18 L 36 40 L 32 40 L 32 18 L 28 18 Z" fill="#0B2D5B"/>
+    
+    <!-- Dynamic 'G' Leaf Arc & Saffron Diya Spark -->
+    <path d="M 34 19 C 39 19 43 23 43 28 C 43 33 39 37 34 37 C 29 37 26 33 26 29 L 30 29 C 30 31 32 33 34 33 C 36.8 33 39 30.8 39 28 C 39 25.2 36.8 23 34 23 L 34 19 Z" fill="#1F8A4C"/>
+    <!-- Saffron Flame Core -->
+    <path d="M 34 10 C 35.5 13 37 16 35.5 19 C 34.5 17 33 16 34 10 Z" fill="#F4A51C"/>
+    
+    <!-- Support Hands Motif Base -->
+    <path d="M 20 46 C 24 53 44 53 48 46 C 44 50 24 50 20 46 Z" fill="#0B2D5B"/>
+  </g>
+  
+  <!-- Wordmark -->
+  <g id="logo-text" transform="translate(88, 16)">
+    <!-- Gujarati Title -->
+    <text x="0" y="16" font-family="'Noto Sans Gujarati', 'Plus Jakarta Sans', sans-serif" font-weight="600" font-size="13" fill="#1F8A4C" letter-spacing="0.5">ગુજરાત ગ્રામીણ બેંક</text>
+    
+    <!-- English Title -->
+    <text x="0" y="36" font-family="'Plus Jakarta Sans', -apple-system, sans-serif" font-weight="800" font-size="18.5" fill="#0B2D5B" letter-spacing="-0.3">GUJARAT GRAMIN BANK</text>
+    
+    <!-- Sponsor Subtitle -->
+    <text x="0" y="50" font-family="'Plus Jakarta Sans', -apple-system, sans-serif" font-weight="600" font-size="9" fill="#5B6778" letter-spacing="0.4">Sponsored by Bank of Baroda &bull; Govt. of India &bull; Govt. of Gujarat</text>
+  </g>
+</svg>

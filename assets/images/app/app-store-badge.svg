@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 48" width="160" height="48" fill="none">
+  <rect width="160" height="48" rx="8" fill="#0A0A0A" stroke="#333333" stroke-width="1"/>
+  <!-- Apple Logo -->
+  <g transform="translate(18, 11)" fill="#FFFFFF">
+    <path d="M12.8 11.4 C12.8 8.6 15 7.1 15.1 7 C13.7 5.1 11.5 4.8 10.7 4.7 C8.9 4.5 7.1 5.8 6.1 5.8 C5.2 5.8 3.7 4.7 2.2 4.7 C0.3 4.7 -1.4 6.3 -2.3 8.3 C-4.2 12.3 -2.8 18.2 -1 21.2 C-0.1 22.7 0.9 24.3 2.3 24.2 C3.7 24.1 4.3 23.3 5.9 23.3 C7.5 23.3 8 24.2 9.5 24.2 C11 24.2 11.9 22.8 12.8 21.3 C13.8 19.6 14.3 17.9 14.3 17.8 C14.2 17.7 12.8 17.1 12.8 11.4 Z" transform="translate(4, 0) scale(0.9)"/>
+    <path d="M9.8 3.5 C10.6 2.5 11.1 1.2 11 0 C9.9 0.1 8.5 0.8 7.8 1.8 C7.1 2.6 6.5 4 6.7 5.2 C7.9 5.3 9.1 4.5 9.8 3.5 Z" transform="translate(4, 0) scale(0.9)"/>
+  </g>
+  <text x="48" y="18" font-family="'Plus Jakarta Sans', sans-serif" font-weight="500" font-size="8" fill="#AAAAAA" letter-spacing="0.5">DOWNLOAD ON THE</text>
+  <text x="48" y="33" font-family="'Plus Jakarta Sans', sans-serif" font-weight="700" font-size="13" fill="#FFFFFF" letter-spacing="0.2">App Store</text>
+</svg>

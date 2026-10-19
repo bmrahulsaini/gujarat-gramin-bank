@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 60" width="240" height="60" fill="none" role="img" aria-label="DICGC Insured Bank">
+  <rect width="240" height="60" rx="10" fill="#F7F9FC" stroke="#E3E8EF" stroke-width="1"/>
+  <!-- Shield Icon -->
+  <g transform="translate(14, 11)">
+    <path d="M19 3 L34 8 V19 C34 29 27 36 19 38 C11 36 4 29 4 19 V8 L19 3 Z" fill="#0B2D5B"/>
+    <path d="M19 6 L31 10 V19 C31 27 25 33 19 35 C13 33 7 27 7 19 V10 L19 6 Z" fill="#1F8A4C"/>
+    <!-- Checkmark -->
+    <path d="M13 19 L17 23 L25 15" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <!-- Text -->
+  <text x="60" y="24" font-family="'Plus Jakarta Sans', sans-serif" font-weight="800" font-size="12" fill="#0B2D5B" letter-spacing="0.5">DICGC INSURED</text>
+  <text x="60" y="38" font-family="'Plus Jakarta Sans', sans-serif" font-weight="600" font-size="9.5" fill="#5B6778">Deposits Protected up to ₹5 Lakh</text>
+  <text x="60" y="49" font-family="'Plus Jakarta Sans', sans-serif" font-weight="500" font-size="8" fill="#1F8A4C">Subsidiary of Reserve Bank of India</text>
+</svg>

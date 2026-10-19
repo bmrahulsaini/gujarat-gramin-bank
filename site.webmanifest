@@ -1,0 +1,21 @@
+{
+  "name": "Gujarat Gramin Bank",
+  "short_name": "GGB",
+  "description": "Gujarat Gramin Bank - Rooted in Gujarat, Growing with you. 745+ branches across 34 districts.",
+  "icons": [
+    {
+      "src": "assets/images/favicon/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/images/favicon/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#0B2D5B",
+  "background_color": "#F7F9FC",
+  "display": "standalone",
+  "start_url": "./index.php"
+}

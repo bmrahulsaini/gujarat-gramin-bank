@@ -1,0 +1,11 @@
+# ==============================================================================
+# GUJARAT GRAMIN BANK - ROBOTS CONFIGURATION
+# Current state: PRIVATE PREVIEW (indexing disabled)
+#
+# WHEN GOING LIVE:
+# Replace "Disallow: /" with "Disallow:" to allow search engines to index all pages.
+# Add your live sitemap URL: Sitemap: https://ggb.bank.in/sitemap.xml
+# ==============================================================================
+
+User-agent: *
+Disallow: /
