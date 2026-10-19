@@ -27,7 +27,7 @@
      ============================================================================ */
   var CONFIG = {
     botName: 'GGB Sahayak',
-    subtitle: 'Answers from this website only',
+    subtitle: 'Here to answer your banking questions',
     footerNote: 'Please confirm important details at your branch.',
 
     // Launcher / panel element ids (created at runtime, kept here so nothing
@@ -36,9 +36,8 @@
     panelId: 'ggb-chat-panel',
 
     // First message shown when the panel opens for the very first time.
-    welcomeMessage: "Namaste! I'm GGB Sahayak. Ask me about deposits, loans, " +
-      'rates, branches or contact details - I only answer using information ' +
-      'already on this website.',
+    welcomeMessage: "I'm GGB Sahayak. I can help with deposits, loans, " +
+      'rates, branches and contact details.',
 
     // Quick-topic chips shown under the message area and on fallback replies.
     chips: [
@@ -58,20 +57,20 @@
       greeting: {
         phrases: ['hi', 'hii', 'hiii', 'hello', 'hey', 'hlo', 'namaste', 'namaskar',
           'good morning', 'good afternoon', 'good evening'],
-        reply: 'Hello! How can I help you with Gujarat Gramin Bank today?'
+        reply: 'Hello. How can I help you with Gujarat Gramin Bank?'
       },
       thanks: {
         phrases: ['thanks', 'thank you', 'thanku', 'thx', 'dhanyavad', 'aabhar', 'ok thanks'],
-        reply: "You're welcome! Is there anything else about GGB I can help with?"
+        reply: "You're welcome. Let me know if you have another question about GGB."
       },
       bye: {
         phrases: ['bye', 'goodbye', 'bye bye', 'see you', 'tata', 'ok bye'],
-        reply: 'Goodbye! Visit again if you have more questions about GGB.'
+        reply: 'Goodbye.'
       },
       about: {
         phrases: ['who are you', 'what are you', 'who r u', 'what is your name', 'tell me about yourself'],
-        reply: "I'm " + 'GGB Sahayak' + ', a website assistant that answers questions ' +
-          'about Gujarat Gramin Bank using only the information published on this site.'
+        reply: "I'm " + 'GGB Sahayak' + ', an assistant for Gujarat Gramin Bank. ' +
+          'I can help with deposits, loans, rates, branches and contact details.'
       }
     },
 
@@ -79,7 +78,7 @@
     // friendly templated reply (see `templates` below, which normally
     // supplies the actual wording shown for these two cases).
     offTopicMessage: 'Sorry, that question is outside my scope.',
-    notFoundMessage: "Sorry, I couldn't find that on this website.",
+    notFoundMessage: "Sorry, I don't have that information.",
 
     // Fraction of a question's meaningful words that must exist on the site
     // (directly, via synonym, or via typo-correction) or it is treated as
@@ -219,110 +218,110 @@
     templates: {
       rates: {
         intros: [
-          "Here's what I found about our rates:",
-          "Sure — here are the current rates on our site:",
-          "Good question! Here's the rate information published here:"
+          "Here is the rate information:",
+          "Here is the current rate:",
+          "Here is the rate detail:"
         ],
         outros: [
-          "Rates can change, so do confirm the latest figure at your branch.",
-          "Let me know if you'd like details on another product too!",
-          "Hope that helps — ask me about any other rate anytime."
+          "Rates are subject to change; confirm the current rate at your branch.",
+          "This rate may be revised; please verify before proceeding.",
+          "Confirm the current rate with your branch before deciding."
         ]
       },
       branches: {
         intros: [
-          "Here's what our site says about branches:",
-          "Sure, here's the branch information I found:",
-          "Here's what I could find on our branch network:"
+          "Here is the branch information:",
+          "Here is the branch detail:",
+          "Here is what I found about branches:"
         ],
         outros: [
           "You can also use the branch locator above to search by district.",
-          "Let me know if you need details for a specific branch.",
-          "Hope this points you in the right direction!"
+          "A list of all branches is available via the locator above.",
+          "Contact a branch directly for further details."
         ]
       },
       chairman: {
         intros: [
-          "I looked, but our website doesn't publish the Chairman's name just yet.",
-          "That's not something this website lists right now.",
-          "I couldn't find Chairman details published on this site."
+          "I don't have the Chairman's name.",
+          "That information is not currently available.",
+          "I don't have Chairman details available."
         ],
         outros: [
-          "You could check with your branch or the Contact section for the latest leadership details.",
-          "Try the Contact section below - they should be able to help with this.",
-          "Our Head Office contact details are a good place to ask about this."
+          "Check the Contact section below, or your branch, for this information.",
+          "The Contact section has Head Office details for this kind of query.",
+          "This is not available here; try the Contact section below."
         ]
       },
       board: {
         intros: [
-          "Our website doesn't currently list the Board of Directors.",
-          "I couldn't find Board of Directors details published here.",
-          "That information isn't published on this site at the moment."
+          "I don't have the Board of Directors list.",
+          "That information is not currently available.",
+          "I don't have Board of Directors details available."
         ],
         outros: [
-          "The Contact section below has our Head Office details if you'd like to ask directly.",
-          "You might find this in official bank notices at your branch.",
-          "Try reaching out through the Contact section for this one."
+          "The Contact section below has Head Office details for this kind of query.",
+          "This may be available in official bank notices at your branch.",
+          "This is not available here; try the Contact section below."
         ]
       },
       charges: {
         intros: [
-          "I couldn't find a full service charges schedule on this website.",
-          "Our site doesn't list a detailed fee/charges table right now.",
-          "That specific charge isn't published here yet."
+          "A full service charges schedule is not currently available.",
+          "That specific charge is not currently available.",
+          "A detailed fee/charges table is not currently available."
         ],
         outros: [
-          "Your branch will have the latest official charges schedule.",
-          "For the exact figure, it's best to confirm with your branch.",
-          "I'd suggest checking with your branch for the up-to-date amount."
+          "Your branch will have the current official charges schedule.",
+          "Confirm the exact amount with your branch.",
+          "Contact your branch for the current charge amount."
         ]
       },
       contact: {
         intros: [
-          "Here's our contact information:",
-          "Sure, here's how you can reach us:",
-          "Here's what I found under Contact:"
+          "Here is the contact information:",
+          "Here are the contact details:",
+          "Here is how to reach the bank:"
         ],
         outros: [
-          "Feel free to reach out directly if you need more help!",
-          "Hope that gets you in touch with the right place.",
-          "Let me know if you need any other contact detail."
+          "This is the most current contact information available.",
+          "Contact the bank directly for further assistance.",
+          "Further contact details are in the Contact section."
         ]
       },
       general: {
         intros: [
-          "Here's what I found on our website:",
-          "Sure, here's the relevant information:",
-          "Here's what our site says about that:"
+          "Here is what I found about that:",
+          "Here is the relevant information:",
+          "Here is the relevant detail:"
         ],
         outros: [
-          "Let me know if you'd like more detail on anything here!",
-          "Hope that helps!",
-          "Feel free to ask me anything else about GGB."
+          "Let me know if you need more detail.",
+          "You can ask about another topic.",
+          "Let me know if you have another question."
         ]
       },
       notFound: {
         intros: [
-          "Hmm, I couldn't find that on this website.",
-          "I searched, but couldn't find a match for that on our site.",
-          "That doesn't seem to be covered on this website."
+          "I don't have that information.",
+          "I couldn't find a match for that.",
+          "That doesn't appear to be something I can help with."
         ],
         outros: [
-          "Here are a few topics I can help with instead:",
-          "Maybe one of these would help:",
-          "You could try one of these topics:"
+          "Here are some topics I can help with:",
+          "You can try one of these topics:",
+          "I can help with these topics:"
         ]
       },
       outOfScope: {
         intros: [
-          "Sorry, that's outside what I can help with.",
-          "That's a bit outside my scope, I'm afraid.",
-          "I'm only able to help with Gujarat Gramin Bank questions, so I can't answer that one."
+          "That is outside what I can answer.",
+          "I can only answer questions about Gujarat Gramin Bank.",
+          "That question is not related to Gujarat Gramin Bank."
         ],
         outros: [
-          "I can help with things like these instead:",
-          "Here's what I CAN help you with:",
-          "Try asking me about one of these:"
+          "The following topics are available:",
+          "You can try one of these topics:",
+          "I can help with these topics:"
         ]
       }
     },
@@ -345,8 +344,8 @@
       rateSpecificWithNote: '{product} interest rate is {value} ({note}).',
       ifsc: 'The IFSC code for {branch} is {value}.',
       branchSpecific: '{branch} ({district} district) - IFSC: {ifsc}, Phone: {phone}, Address: {address}.',
-      notFoundWithAlt: "I couldn't find {thing} on this website. You can reach the bank at {alt}.",
-      notFoundPlain: "I couldn't find {thing} on this website."
+      notFoundWithAlt: "I don't have {thing}. You can reach the bank at {alt}.",
+      notFoundPlain: "I don't have {thing}."
     }
   };
 
@@ -1357,14 +1356,14 @@
     return bestScore >= 1 ? best : null;
   }
 
-  // Appends the "View on website" link and wraps everything into the same
+  // Appends a "View details" link and wraps everything into the same
   // { kind:'answer', blocks, html, ... } shape the UI already knows how to
   // render/animate - no separate rendering path needed for direct answers.
   function finishDirectAnswer(leadBlocks, sectionId) {
     var linkBlock = {
       type: 'raw',
       html: '<p class="ggb-chat-link-line"><a href="#' + escapeHtml(sectionId) + '" class="ggb-chat-jump" data-section="' +
-        escapeHtml(sectionId) + '">View on website &rarr;</a></p>'
+        escapeHtml(sectionId) + '">View details &rarr;</a></p>'
     };
     var blocks = leadBlocks.concat([linkBlock]);
     var text = leadBlocks
@@ -1457,7 +1456,7 @@
         return finishDirectAnswer([textBlock('p', null, sentence3)], bStat.sectionId);
       }
       if (FACTS.branches.length) {
-        var sentence4 = 'Gujarat Gramin Bank has at least ' + FACTS.branches.length + ' branches listed on this website.';
+        var sentence4 = 'Gujarat Gramin Bank has at least ' + FACTS.branches.length + ' branches.';
         return finishDirectAnswer([textBlock('p', null, sentence4)], 'branches');
       }
       return directNotFound('the branch count');
@@ -1766,7 +1765,7 @@
     var blocks = [];
     if (unknownWords.length) {
       blocks.push(textBlock('p', 'ggb-chat-unknown-note',
-        'I couldn’t find ‘' + unknownWords[0] + '’ on this website - showing the closest match instead.'));
+        'I couldn’t find ‘' + unknownWords[0] + '’ - showing the closest match instead.'));
     }
     blocks.push(textBlock('p', 'ggb-chat-intro-line', pickRandom(tpl.intros)));
     blocks.push(textBlock('p', 'ggb-chat-answer-title', sectionTitle, [], pageTagHtml));
@@ -1777,7 +1776,7 @@
     blocks.push({
       type: 'raw',
       html: '<p class="ggb-chat-link-line"><a href="' + escapeHtml(jumpHref) + '" class="ggb-chat-jump" data-section="' +
-        escapeHtml(topSectionId) + '"' + crossPageAttr + '>View on website &rarr;</a></p>'
+        escapeHtml(topSectionId) + '"' + crossPageAttr + '>View details &rarr;</a></p>'
     });
     blocks.push(textBlock('p', 'ggb-chat-outro-line', pickRandom(tpl.outros)));
 
