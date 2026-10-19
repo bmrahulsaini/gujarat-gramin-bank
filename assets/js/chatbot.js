@@ -2098,6 +2098,9 @@
     if (!ui.greeted) {
       ui.greeted = true;
       appendMessage('bot', escapeHtml(CONFIG.welcomeMessage));
+      // The wave badge only needs to show until it's actually been noticed and used.
+      var waveBadge = document.querySelector('.ggb-wave-badge');
+      if (waveBadge) waveBadge.remove();
     }
     window.setTimeout(function () { if (ui.input) ui.input.focus(); }, 50);
   }
@@ -2118,6 +2121,15 @@
     var launcher = document.getElementById(CONFIG.launcherId);
     if (!launcher) return;
     launcher.setAttribute('aria-expanded', 'false');
+    // Attention cue: a waving-hand badge next to (not on) the bot icon,
+    // until the visitor actually opens the chat once (removed in
+    // openPanel()). Decorative only - never read by screen readers, never
+    // blocks clicks on the button itself.
+    var waveBadge = document.createElement('span');
+    waveBadge.className = 'ggb-wave-badge';
+    waveBadge.setAttribute('aria-hidden', 'true');
+    waveBadge.textContent = '👋';
+    launcher.appendChild(waveBadge);
     launcher.addEventListener('click', function (e) {
       e.stopPropagation();
       togglePanel();
