@@ -1210,7 +1210,20 @@
      7. UI - launcher wiring + panel built and injected at runtime.
      ============================================================================ */
 
-  var ui = { panel: null, messages: null, input: null, sendBtn: null, opened: false, greeted: false, busy: false };
+  var ui = {
+    panel: null, messages: null, input: null, sendBtn: null, chipsRow: null,
+    opened: false, greeted: false, busy: false, hasChatted: false
+  };
+
+  // The persistent chips row is a "nothing's happening yet" suggestion -
+  // visible while idle (chat not yet started AND the input box is empty),
+  // hidden as soon as the visitor starts typing a question, and hidden for
+  // good once the first message has actually been sent.
+  function updateChipsRowVisibility() {
+    if (!ui.chipsRow) return;
+    var isTyping = !!(ui.input && ui.input.value.trim());
+    ui.chipsRow.hidden = ui.hasChatted || isTyping;
+  }
 
   function buildPanelHtml() {
     return (
@@ -1418,6 +1431,8 @@
     if (ui.busy || !question.trim()) return;
     appendUserMessage(question);
     if (ui.input) ui.input.value = '';
+    ui.hasChatted = true;
+    updateChipsRowVisibility(); // chat has started now - hidden for good
 
     var result = answer(question);
     ui.busy = true;
@@ -1453,11 +1468,14 @@
       handleAsk(ui.input.value);
     });
 
-    var chipsRow = document.getElementById('ggb-chat-chips-row');
-    chipsRow.addEventListener('click', function (e) {
+    ui.chipsRow = document.getElementById('ggb-chat-chips-row');
+    ui.chipsRow.addEventListener('click', function (e) {
       var btn = e.target.closest('.ggb-chat-chip');
       if (btn) handleAsk(btn.getAttribute('data-query'));
     });
+
+    ui.input.addEventListener('input', updateChipsRowVisibility);
+    updateChipsRowVisibility(); // idle at start: visible, nothing typed yet
 
     ui.messages.addEventListener('click', function (e) {
       var btn = e.target.closest('.ggb-chat-chip');
